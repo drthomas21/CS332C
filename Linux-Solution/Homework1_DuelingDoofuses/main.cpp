@@ -52,6 +52,8 @@ public:
 	}
 };
 
+void strategy1(unsigned int, Person[], int);
+void strategy2(unsigned int, Person[], int);
 void reset(Person[], int);
 int numOfAlivePlayers(Person[], int);
 void alivePlayersWon(Person[], int);
@@ -64,14 +66,50 @@ int main() {
 	std::cout << "Welcome to Dueling Doofuses" << std::endl;
 
 	//Data
-	Person players[3] = {Person("Jason",(1.0/3.0)),Person("Kyle",(1.0/2.0)),Person("Lenny",1.0)};
+	Person players[3] = { Person("Jason",(1.0 / 3.0)),Person("Kyle",(1.0 / 2.0)),Person("Lenny",1.0) };
 	int size = 3;
 	unsigned int limit = 100000;
-	unsigned int turn = 0;
 
-	//Loops
+	int choice;
 	do {
-		std::cout << "Match " << (turn+1) << std::endl;
+		std::cout << "Which strategy would you like to use? \n\t(1) Normal \n\t(2) Jason always misses first shot\n:";
+		std::cin >> choice;
+		if (std::cin.fail()) {
+			std::cout << "Invalid value" << std::endl;
+			choice = 0;
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+		}
+	} while (choice < 1 || choice > 2);
+	//Loops
+	std::cout << "Running simulation, please wait patiently..." << std::endl;
+	if (choice == 1) {
+		strategy1(limit, players, size);
+	}
+	else {
+		strategy2(limit, players, size);
+	}
+	std::cout << "Finished simulation" << std::endl;
+
+	for (int i = 0; i < size; i++) {
+		std::cout << players[i].getName() << "'s Record: " << players[i].getMatchesWon() << "/" << limit << " = " << ((double)players[i].getMatchesWon() / (double)limit * 100.0) << std::endl;
+	}
+
+	return 0;
+}
+
+/**
+	Normal Strategy
+	@param unsigned int limit
+		how many turns
+	@param array(Person)
+		list of players
+	@param int size
+		number of players
+*/
+void strategy1(unsigned int limit, Person players[], int size) {
+	unsigned int turn = 0;
+	do {
 		do {
 			//Match
 			for (int i = 0; i < size; i++) {
@@ -82,24 +120,55 @@ int main() {
 				if (playerHitsTarget(players[i])) {
 					Person* target = getTarget(players[i], players, size);
 					(*target).died();
-				} 
+				}
 			}
 		} while (numOfAlivePlayers(players, size) > 1);
 		alivePlayersWon(players, size);
 		turn++;
 		reset(players, size);
 	} while (turn < limit);
+}
 
-	for (int i = 0; i < size; i++) {
-		std::cout << players[i].getName() << "'s Record: " << players[i].getMatchesWon() << "/" << limit << " = " << ((double)players[i].getMatchesWon() / (double)limit * 100.0) << std::endl;
-	}
+/**
+	Jason Always Misses First Shot
+	@param unsigned int limit
+		how many turns
+	@param array(Person)
+		list of players
+	@param int size
+		number of players
+*/
+void strategy2(unsigned int limit, Person players[], int size) {
+	unsigned int turn = 0;
+	unsigned int unsignedSize = static_cast<unsigned int>(size);
+	do {
+		bool firstRound = true;
+		do {
+			//Match
+			for (int i = 0; i < size; i++) {
+				if (players[i].isDead()) {
+					continue;
+				}
 
-	return 0;
+				//Jason has to miss first shot
+				if (playerHitsTarget(players[i]) && ((firstRound && players[i].getName().compare("Jason") != 0) || !firstRound)) {
+					Person* target = getTarget(players[i], players, size);
+					(*target).died();
+				}
+			}
+			firstRound = false;
+		} while (numOfAlivePlayers(players, size) > 1);
+		alivePlayersWon(players, size);
+		turn++;
+		reset(players, size);
+	} while (turn < limit);
 }
 
 /**
 	@param array(Person) players
 		an array of Persons
+	@param int size
+		number of players
 */
 void reset(Person players[], int size) {
 	for (int i = 0; i < size; i++) {
@@ -110,6 +179,8 @@ void reset(Person players[], int size) {
 /**
 	@param array(Person) players
 		an array of Persons
+	@param int size
+		number of players
 */
 int numOfAlivePlayers(Person players[], int size) {
 	int count = 0;
@@ -124,6 +195,8 @@ int numOfAlivePlayers(Person players[], int size) {
 /**
 	@param array(Person) players
 		an array of Persons
+	@param int size
+		number of players
 */
 void alivePlayersWon(Person players[], int size) {
 	for (int i = 0; i < size; i++) {
@@ -143,8 +216,12 @@ bool playerHitsTarget(Person &player) {
 }
 
 /**
+	@param Person self
+		the current shooter
 	@param array(Person) players
 		an array of Persons
+	@param int size
+		number of players
 	@return Person target
 */
 Person* getTarget(Person &self, Person players[], int size) {

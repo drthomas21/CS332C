@@ -72,6 +72,7 @@ int main() {
 		returns a number in the range [1,6]
 */
 int diceRoll() {
+	//generate a random number in the range of [0,5] then increment by 1 = [1,6]
 	return (rand() % 5) + 1;
 }
 

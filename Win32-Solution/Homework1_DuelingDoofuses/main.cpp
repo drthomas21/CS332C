@@ -80,7 +80,7 @@ int main() {
 			std::cin.clear();
 			std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 		}
-	} while (choice < 1 && choice > 2);
+	} while (choice < 1 || choice > 2);
 	//Loops
 	std::cout << "Running simulation, please wait patiently..." << std::endl;
 	if (choice == 1) {

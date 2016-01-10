@@ -11,6 +11,9 @@ int main() {
 		char resp;
 		std::cout << "Would you like to predict your child height? (y/n) ";
 		std::cin >> resp;
+		//clear char buffer from extra characters
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 
 		//Process resp
 		if (resp == 'n' || resp == 'N') {
@@ -22,12 +25,23 @@ int main() {
 			do {
 				std::cout << "What is the father and mother height? ";
 				std::cin >> fatherHeight >> motherHeight;
+				if (std::cin.fail()) {
+					std::cout << "Invalid value" << std::endl;
+					fatherHeight = 0;
+					motherHeight = 0;
+					std::cin.clear();
+					std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+					continue;
+				}
 			} while (fatherHeight <= 0 && motherHeight <= 0);
 
 			do {
 				resp = NULL;
 				std::cout << "Is the child a male? (y/n) ";
 				std::cin >> resp;
+				//clear char buffer from extra characters
+				std::cin.clear();
+				std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 			} while (resp != 'Y' && resp != 'y' && resp != 'N' && resp != 'n');
 
 			std::cout << "The predicted child height is: " << childHeight(fatherHeight, motherHeight, (resp == 'Y' || resp == 'y')) << std::endl;

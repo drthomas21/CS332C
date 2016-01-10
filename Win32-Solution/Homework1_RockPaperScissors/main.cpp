@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <limits>
 
 std::string fancyMessage(int, int, int);
 int didPlayer1Win(char, char);
@@ -120,7 +121,7 @@ int didPlayer1Win(char player1Choice, char player2Choice) {
 		s = scissors (num = 3)
 */
 char numToChoice(int num) {
-	char choice = NULL;
+	char choice = ' ';
 	switch (num) {
 		case 1:
 			choice = 'r';

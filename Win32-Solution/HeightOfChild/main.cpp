@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 
 double childHeight(double, double, bool = true);
 int main() {
@@ -36,7 +37,7 @@ int main() {
 			} while (fatherHeight <= 0 && motherHeight <= 0);
 
 			do {
-				resp = NULL;
+				resp = ' ';
 				std::cout << "Is the child a male? (y/n) ";
 				std::cin >> resp;
 				//clear char buffer from extra characters

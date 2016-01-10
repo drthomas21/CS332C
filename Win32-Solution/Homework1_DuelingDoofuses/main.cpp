@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
-#include <vector>
+#include <limits>
 
 class Person {
 	std::string name;

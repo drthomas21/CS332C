@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <limits>
 
 int diceRoll();
 char shouldComputerRollAgain(int turnPoints);

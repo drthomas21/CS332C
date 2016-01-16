@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Homework1_DiceGame", "Homew
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Homework1_DuelingDoofuses", "Homework1_DuelingDoofuses\Homework1_DuelingDoofuses.vcxproj", "{29591089-371D-44D5-9190-35A1E197ED02}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Homework2_ArrayManipulation", "Homework2_ArrayManipulation\Homework2_ArrayManipulation.vcxproj", "{E337246E-BDD3-437C-A997-6DEA5FDB4A56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{29591089-371D-44D5-9190-35A1E197ED02}.Release|x64.Build.0 = Release|x64
 		{29591089-371D-44D5-9190-35A1E197ED02}.Release|x86.ActiveCfg = Release|Win32
 		{29591089-371D-44D5-9190-35A1E197ED02}.Release|x86.Build.0 = Release|Win32
+		{E337246E-BDD3-437C-A997-6DEA5FDB4A56}.Debug|x64.ActiveCfg = Debug|x64
+		{E337246E-BDD3-437C-A997-6DEA5FDB4A56}.Debug|x64.Build.0 = Debug|x64
+		{E337246E-BDD3-437C-A997-6DEA5FDB4A56}.Debug|x86.ActiveCfg = Debug|Win32
+		{E337246E-BDD3-437C-A997-6DEA5FDB4A56}.Debug|x86.Build.0 = Debug|Win32
+		{E337246E-BDD3-437C-A997-6DEA5FDB4A56}.Release|x64.ActiveCfg = Release|x64
+		{E337246E-BDD3-437C-A997-6DEA5FDB4A56}.Release|x64.Build.0 = Release|x64
+		{E337246E-BDD3-437C-A997-6DEA5FDB4A56}.Release|x86.ActiveCfg = Release|Win32
+		{E337246E-BDD3-437C-A997-6DEA5FDB4A56}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

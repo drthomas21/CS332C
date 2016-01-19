@@ -168,7 +168,7 @@ void isInOrder(const int list[], bool asc = true) {
 
 //Method 5
 void hasAdjancent(const int list[], int min = 3) {
-	int count = 0;
+	int count = 1;
 	int match = list[0];
 	bool ret = false;
 	for (int i = 1; i < SIZE; i++) {
@@ -181,7 +181,7 @@ void hasAdjancent(const int list[], int min = 3) {
 			}
 		} else {
 			match = list[i];
-			count = 0;
+			count = 1;
 		}
 	}
 	std::cout << "Method 05: " << (ret ? "True" : "False") << std::endl;

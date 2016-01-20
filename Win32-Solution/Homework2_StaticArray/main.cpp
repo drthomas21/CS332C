@@ -55,40 +55,40 @@ int main() {
 			continue;
 		}
 		
-		int point = NULL, amount = NULL;
+		int point = 0, amount = 0;
 		std::string plane = "";
 		switch (input) {
 			case(1):				
-				while (point == NULL || amount == NULL) {
+				while (point == 0) {
 					std::cout << "Input <point [1-" << size << "]> and <amount>" << std::endl;
 					std::cin >> point >> amount;
 					if (std::cin.fail()) {
 						std::cout << "Invalid value" << std::endl;
-						point = NULL, amount = NULL;;
+						point = 0, amount = 0;
 						std::cin.clear();
 						std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 						continue;
 					}
 					if (point < 1 || point > size) {
-						point = NULL;
+						point = 0;
 					}
 				}
 			
 			   translate(points[point-1], amount);
 			   break;
 			case(2) :
-				while (point == NULL || plane.compare("") == 0) {
+				while (point == 0 || plane.compare("") == 0) {
 					std::cout << "Input <point [1-" << size << "]> and <plane>" << std::endl;
 					std::cin >> point >> plane;
 					if (std::cin.fail()) {
 						std::cout << "Invalid value" << std::endl;
-						point = NULL, plane = "";
+						point = 0, plane = "";
 						std::cin.clear();
 						std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 						continue;
 					}
 					if (point < 1 || point > size) {
-						point = NULL;
+						point = 0;
 					}
 					if (plane.compare("xy") != 0 && plane.compare("yx") != 0 && plane.compare("xz") != 0 && plane.compare("zx") != 0 && plane.compare("zy") != 0 && plane.compare("yz") != 0) {
 						plane = "";

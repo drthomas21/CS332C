@@ -26,7 +26,7 @@ int main() {
 
 	std::cout << "Welcome to Static Array" << std::endl;
 
-	std::ifstream fileResc= std::ifstream(FILENAME);
+	std::ifstream fileResc(FILENAME);
 	if (!fileResc.good()) {
 		std::cout << "There is an issue with opening the file at " << FILENAME << std::endl;
 		exit(1);

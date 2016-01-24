@@ -4,8 +4,8 @@ namespace game {
 	namespace pieces {
 		class Bat : public ComputerPlayer {
 		public:
-			Bat(char*, int, int);
-			Bat(char*);
+			Bat(int,char*, int, int);
+			Bat(int, char*);
 			void doAction();
 		};
 	}

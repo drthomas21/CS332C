@@ -2,11 +2,12 @@
 
 namespace game {
 	namespace pieces {
-		Arrow::Arrow(char* name, int x, int y)
-			:name(name),pointX(x),pointY(y) {
+		Arrow::Arrow(int i, char* name, int x, int y)
+			:Piece(i,name,x,y) {
 
 		};
-		Arrow::Arrow(char* name) :name(name){
+		Arrow::Arrow(int i, char* name) 
+			:Piece(i,name) {
 
 		}
 	}

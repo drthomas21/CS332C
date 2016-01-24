@@ -4,8 +4,8 @@ namespace game {
 	namespace pieces {
 		class Wumpus : public ComputerPlayer {
 		public:
-			Wumpus(char*, int, int);
-			Wumpus(char*);
+			Wumpus(int,char*, int, int);
+			Wumpus(int,char*);
 			void doAction();
 		};
 	}

@@ -4,8 +4,8 @@ namespace game {
 	namespace pieces {
 		class Trap : public ComputerPlayer {
 		public:
-			Trap(char*, int, int);
-			Trap(char*);
+			Trap(int,char*, int, int);
+			Trap(int,char*);
 			void doAction();
 		};
 	}

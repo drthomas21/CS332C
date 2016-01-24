@@ -4,8 +4,8 @@ namespace game {
 	namespace pieces {
 		class Player : public Piece {
 		public:
-			Player(char*, int, int);
-			Player(char*);
+			Player(int, char*, int, int);
+			Player(int, char*);
 		};
 	}
 }

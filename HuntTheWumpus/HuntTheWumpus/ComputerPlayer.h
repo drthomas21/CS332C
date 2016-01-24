@@ -3,13 +3,12 @@
 namespace game {
 	namespace pieces {
 		class ComputerPlayer : public Piece {
-		public:
-			virtual void doAction();
-			char* getName() final;
-			int getPositionX() final;
-			int getPositionY() final;
-			void setPositionX(int x) final;
-			void setPositionY(int y) final;
+		protected:
+			//Only children can call constructor
+			ComputerPlayer(int, char*, int, int);
+			ComputerPlayer(int, char*);
+		public:			
+			virtual void doAction() = 0;
 		};
 	}
 }

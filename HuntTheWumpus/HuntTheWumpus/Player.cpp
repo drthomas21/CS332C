@@ -1,5 +1,5 @@
-#pragma once
-#include "Player.h";
+#include "Player.h"
+
 namespace game {
 	namespace pieces {
 		Player::Player(int i, char* n, int x, int y)

@@ -1,5 +1,6 @@
+#include "Piece.h"
 #pragma once
-#include "Piece.h";
+
 namespace game {
 	namespace pieces {
 		class ComputerPlayer : public Piece {

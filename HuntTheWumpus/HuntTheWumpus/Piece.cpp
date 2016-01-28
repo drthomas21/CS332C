@@ -1,4 +1,5 @@
 #include "Piece.h"
+
 namespace game {
 	Piece::Piece() {
 		this->id = 0;

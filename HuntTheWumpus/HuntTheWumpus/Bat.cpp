@@ -1,4 +1,5 @@
 #include "Bat.h"
+#include "Board.h"
 
 namespace game {
 	namespace pieces {
@@ -12,7 +13,12 @@ namespace game {
 		}
 
 		void Bat::doAction() {
+			int x =0, y=0;
+			do {
+				x = Board::getRandomNum(), y = Board::getRandomNum();
+			} while (!Board::getInstance()->isLocationFree(x, y));
 
+			Board::getInstance()->placePiece(0, x, y);
 		}
 	}
 }

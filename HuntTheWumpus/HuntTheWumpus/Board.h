@@ -1,10 +1,9 @@
-#pragma once
 #include "Piece.h"
+#include <string>
+#pragma once
+
 namespace game {
 	class Board {
-		enum IDS { EMPTY_SPACE, PLAYER_ID, WAMPUS_ID, TELEPORT_ID, TRAP_ID, ARROW_ID };
-		enum EVENT_RESPONSE { INVALID_MOVE, NOTHING_HAPPENED, KILLED_WAMPUS, ATE_BY_WAMPUS, TELEPORTED, TRIGGERED_TRAP, GOT_ARROW };
-		enum DIRECTIONS { NORTH, WEST, SOUTH, EAST };
 		private:
 			static Board* Instance;
 			void operator =(Board const&);
@@ -18,7 +17,7 @@ namespace game {
 
 			//Constructor
 			Board();
-			Board(Board const&);
+			~Board();
 
 			//Functions
 			bool const isValidLocation(int, int);
@@ -27,15 +26,23 @@ namespace game {
 			bool const moveSouth(int);
 			bool const moveEast(int);
 			bool const moveWest(int);
-			void placePiece(int, int, int);
 			void setUp();
 		public:
+			//Constants
+			enum IDS { EMPTY_SPACE = -10, DISCOVERED_SPACE };
+			enum EVENT_RESPONSE { INVALID_MOVE, NOTHING_HAPPENED, KILLED_WAMPUS, ATE_BY_WAMPUS, TELEPORTED, TRIGGERED_TRAP, GOT_ARROW };
+			enum DIRECTIONS { NORTH, WEST, SOUTH, EAST };
+
 			//Singleton
 			static Board* getInstance();
 			static void setBoardSize(int);
+			static int const getSize();
+			static int const getRandomNum();
 
 			//Functions
-			bool const move(int, int);
-			int const getSize();
+			bool const move(int, int);			
+			bool const isLocationFree(int, int);
+			void placePiece(int, int, int);
+			std::string printBoard(bool);
 	};
 }

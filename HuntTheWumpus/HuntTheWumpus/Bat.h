@@ -1,5 +1,6 @@
+#include "ComputerPlayer.h"
 #pragma once
-#include "ComputerPlayer.h";
+
 namespace game {
 	namespace pieces {
 		class Bat : public ComputerPlayer {

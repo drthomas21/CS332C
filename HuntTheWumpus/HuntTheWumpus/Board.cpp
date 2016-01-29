@@ -7,6 +7,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <string>
+#include <iostream>
 
 namespace game {
 	//Static Variables
@@ -14,26 +15,38 @@ namespace game {
 	int Board::size = 0;
 
 	//Private & Protected functions
-	bool const Board::isValidLocation(int x, int y) {
+	bool const Board::isValidLocation(Slot const oldSlot, int x, int y) {
 		bool ret = x >= 0 && x < Board::size && y >= 0 && y < Board::size;
+		if (ret) {
+			if (this->slots[x][y].id != Board::EMPTY_SPACE && this->slots[x][y].id != Board::DISCOVERED_SPACE) {
+				//Toggle Event
+				this->pieces[this->slots[x][y].id]->doAction(oldSlot.id);
+				if (this->event != Board::GOT_ARROW && this->event != Board::NOTHING_HAPPENED) {
+					ret = false;
+				}
+			}
+		}
 		return ret;
 	}
 	bool const Board::isValidLocation(int x, int y, int s) {
 		bool ret = x >= 0 && x < Board::size && y >= 0 && y < Board::size;
 		if (ret) {
-			for (int i = 0; i < s; i++) {
-				if (this->pieces[i].getPositionX() == x && this->pieces[i].getPositionY() == y) {
-					ret = false;
-					break;
-				}
+			if (this->slots[x][y].id != Board::EMPTY_SPACE && this->slots[x][y].id != Board::DISCOVERED_SPACE) {
+				ret = false;
 			}
 		}
 		return ret;
 	}
 	bool const Board::moveNorth(int id) {
 		bool ret = false;
-		int x = this->pieces[id].getPositionX(), y = this->pieces[id].getPositionY();
-		if (this->isValidLocation(x, y - 1)) {
+		Slot* slot = this->getSlot(id);
+		int x, y;
+		if (slot == nullptr) {
+			std::cout << "Piece does not exists" << std::endl;
+			exit(1);
+		}
+		x = slot->x, y = slot->y;
+		if (this->isValidLocation(*slot,x, y - 1)) {
 			this->placePiece(id, x, y - 1);
 			ret = true;
 		}
@@ -42,8 +55,14 @@ namespace game {
 	}
 	bool const Board::moveSouth(int id) {
 		bool ret = false;
-		int x = this->pieces[id].getPositionX(), y = this->pieces[id].getPositionY();
-		if (this->isValidLocation(x, y + 1)) {
+		Slot* slot = this->getSlot(id);
+		int x, y;
+		if (slot == nullptr) {
+			std::cout << "Piece does not exists" << std::endl;
+			exit(1);
+		}
+		x = slot->x, y = slot->y;
+		if (this->isValidLocation(*slot,x, y + 1)) {
 			this->placePiece(id, x, y + 1);
 			ret = true;
 		}
@@ -52,8 +71,14 @@ namespace game {
 	}
 	bool const Board::moveEast(int id) {
 		bool ret = false;
-		int x = this->pieces[id].getPositionX(), y = this->pieces[id].getPositionY();
-		if (this->isValidLocation(x + 1, y)) {
+		Slot* slot = this->getSlot(id);
+		int x, y;
+		if (slot == nullptr) {
+			std::cout << "Piece does not exists" << std::endl;
+			exit(1);
+		}
+		x = slot->x, y = slot->y;
+		if (this->isValidLocation(*slot,x + 1, y)) {
 			this->placePiece(id, x + 1, y);
 			ret = true;
 		}
@@ -62,8 +87,14 @@ namespace game {
 	}
 	bool const Board::moveWest(int id) {
 		bool ret = false;
-		int x = this->pieces[id].getPositionX(), y = this->pieces[id].getPositionY();
-		if (this->isValidLocation(x - 1, y)) {
+		Slot* slot = this->getSlot(id);
+		int x, y;
+		if (slot == nullptr) {
+			std::cout << "Piece does not exists" << std::endl;
+			exit(1);
+		}
+		x = slot->x, y = slot->y;
+		if (this->isValidLocation(*slot,x - 1, y)) {
 			this->placePiece(id, x - 1, y);
 			ret = true;
 		}
@@ -84,12 +115,12 @@ namespace game {
 			this->players = 8;
 		}
 
-		this->pieces = new Piece[this->players];
+		this->pieces = new Piece*[this->players];
 		int x = 0, y = 0;
 
 		//Place the player
 		x = rand() % Board::size, y = rand() % Board::size;
-		this->pieces[0] = pieces::Player(id, "You");
+		this->pieces[0] = new pieces::Player(id, "You");
 		this->placePiece(id, x, y);
 		id++;
 
@@ -97,7 +128,7 @@ namespace game {
 		do {
 			x = rand() % Board::size, y = rand() % Board::size;
 		} while (!this->isValidLocation(x,y,id));
-		this->pieces[1] = pieces::Wumpus(id, "Wumpus");
+		this->pieces[1] = new pieces::Wumpus(id, "Wumpus");
 		this->placePiece(id, x, y);
 		id++;
 		
@@ -121,7 +152,7 @@ namespace game {
 				x = rand() % Board::size, y = rand() % Board::size;
 			} while (!this->isValidLocation(x, y, id));
 			std::string name = "Trap " + (i + 1);
-			this->pieces[id] = pieces::Trap(id, "Trap");
+			this->pieces[id] = new pieces::Trap(id, "Trap");
 			this->placePiece(id, x, y);
 			id++;
 		}
@@ -133,7 +164,7 @@ namespace game {
 				x = rand() % Board::size, y = rand() % Board::size;
 			} while (!this->isValidLocation(x, y, id));
 			std::string name = "Bat " + (i + 1);
-			this->pieces[id] = pieces::Bat(id, "Bat");
+			this->pieces[id] = new pieces::Bat(id, "Bat");
 			this->placePiece(id, x, y);
 			id++;
 		}
@@ -145,14 +176,27 @@ namespace game {
 				x = rand() % Board::size, y = rand() % Board::size;
 			} while (!this->isValidLocation(x, y, id));
 			std::string name = "Arrow"  + (i + 1);
-			this->pieces[id] = pieces::Arrow(id, "Arrow");
+			this->pieces[id] = new pieces::Arrow(id, "Arrow");
 			this->placePiece(id, x, y);
 			id++;
 		}
 	}
 
+	Slot* const Board::getSlot(int id) {
+		Slot* slot = nullptr;
+		for (int _x = 0; _x < Board::size; _x++) {
+			for (int _y = 0; _y < Board::size; _y++) {
+				if (this->slots[_x][_y].id == id) {
+					slot = &this->slots[_x][_y];
+				}
+			}
+		}
+
+		return slot;
+	}
+
 	//Public functions	
-	bool const Board::move(int direction, int id) {
+	bool const Board::move(int id, Board::DIRECTIONS direction) {
 		bool ret = false;
 		switch (direction) {
 			case(Board::NORTH) :
@@ -172,21 +216,20 @@ namespace game {
 	}
 
 	bool const Board::isLocationFree(int x, int y) {
-		return this->isValidLocation(x, y);
+		return this->isValidLocation(x, y, Board::size);
 	}
 
 	void Board::placePiece(int id, int x, int y) {
-		int _x = this->pieces[id].getPositionX(), _y = this->pieces[id].getPositionY();
-		this->pieces[id].setPositionX(x);
-		this->pieces[id].setPositionY(y);
+		Slot* oldSlot = this->getSlot(id);
 
 		//Only set the previous spot to "empty_space" if the piece was originally there
-		if (this->slots[_x][_y] == id) {
-			this->slots[_x][_y] = Board::EMPTY_SPACE;
+		//std::cout << "Old spot " << oldSlot.id << ":" << id << std::endl;
+		if (oldSlot != nullptr && oldSlot->id == id) {
+			oldSlot->id = Board::EMPTY_SPACE;
 		}
 
 		//Set the id to the new location
-		this->slots[x][y] = id;
+		this->slots[x][y].id = id;
 	}
 
 	std::string Board::printBoard(bool fog) {
@@ -208,7 +251,7 @@ namespace game {
 			output.append( "\n");
 		}
 		//Output board
-		for (int x = 0; x < Board::size; x++) {
+		for (int y = 0; y < Board::size; y++) {
 			//Row divider
 			if (!fog) {
 				//Number buffer
@@ -223,11 +266,11 @@ namespace game {
 			//Characters and Shade
 			if (!fog) {
 				//Output side numbers
-				int _i = x % 10;
+				int _i = y % 10;
 				output.append(std::to_string(_i) + " ");
 			}
-			for (int y = 0; y < Board::size; y++) {
-				switch (this->slots[x][y]) {
+			for (int x = 0; x < Board::size; x++) {
+				switch (this->slots[x][y].id) {
 					case(Board::EMPTY_SPACE) :
 						output.append( "|");
 						output.push_back(shade);
@@ -245,7 +288,7 @@ namespace game {
 						output.push_back(wumpus);
 						break;
 					default:
-						char *name = this->pieces[this->slots[x][y]].getName();
+						char *name = this->pieces[this->slots[x][y].id]->getName();
 						switch (name[0]) {
 							case('B') :
 								output.append( "|");
@@ -284,6 +327,16 @@ namespace game {
 		return output;
 	}
 
+	void Board::setEvent(Board::EVENT_RESPONSE event) {
+		this->event = event;
+	}
+
+	Board::EVENT_RESPONSE const Board::getEvent() {
+		Board::EVENT_RESPONSE resp =  this->event;
+		this->event = Board::NOTHING_HAPPENED;
+		return resp;
+	}
+
 	//Singleton
 	Board* Board::getInstance() {
 		if (!Board::Instance) {
@@ -313,11 +366,12 @@ namespace game {
 	
 	//Constructors
 	Board::Board() {
-		this->slots = new int*[Board::size];
-		for (int i = 0; i < Board::size; i++) {
-			this->slots[i] = new int[Board::size];
-			for (int j = 0; j < Board::size; j++) {
-				this->slots[i][j] = Board::EMPTY_SPACE;
+		this->event = Board::NOTHING_HAPPENED;
+		this->slots = new Slot*[Board::size];
+		for (int x = 0; x < Board::size; x++) {
+			this->slots[x] = new Slot[Board::size];
+			for (int y = 0; y < Board::size; y++) {
+				this->slots[x][y] = Slot{ x,y,Board::EMPTY_SPACE };
 			}
 		}
 		this->setUp();
@@ -328,5 +382,10 @@ namespace game {
 			delete [] this->slots[i];
 		}
 		delete [] this->slots;
+		
+		for (int i = 0; i<this->players; i++) {
+			delete this->pieces[i];
+		}
+		delete[] this->pieces;
 	}
 }

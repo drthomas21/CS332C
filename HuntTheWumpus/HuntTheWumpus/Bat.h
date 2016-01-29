@@ -1,13 +1,12 @@
-#include "ComputerPlayer.h"
+#include "Piece.h"
 #pragma once
 
 namespace game {
 	namespace pieces {
-		class Bat : public ComputerPlayer {
+		class Bat : public Piece {
 		public:
-			Bat(int,char*, int, int);
 			Bat(int, char*);
-			void doAction();
+			void doAction(int);
 		};
 	}
 }

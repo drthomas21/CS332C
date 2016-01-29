@@ -1,13 +1,12 @@
-#include "ComputerPlayer.h"
+#include "Piece.h"
 #pragma once
 
 namespace game {
 	namespace pieces {
-		class Wumpus : public ComputerPlayer {
+		class Wumpus : public Piece {
 		public:
-			Wumpus(int,char*, int, int);
 			Wumpus(int,char*);
-			void doAction();
+			void doAction(int);
 		};
 	}
 }

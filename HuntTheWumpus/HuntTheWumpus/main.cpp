@@ -11,12 +11,14 @@
 #include "Trap.h"
 #include "Wumpus.h"
 
-const bool DEBUG = false;
+const bool DEBUG = true;
+const bool GOD_MODE = true;
 const int SMALL = 7;
 const int MEDIUM = 14;
 const int LARGE = 30;
 
 void displayBoard();
+char askDirection();
 
 int main() {
 	//Setup
@@ -48,17 +50,77 @@ int main() {
 			break;
 	}
 
+	//Create Game Board
+	game::Board::getInstance();
+	bool run = true;
 	do {
-		//Create Game Board
-		game::Board::getInstance();
-
 		//Display Board
 		displayBoard();
 
 		//Check events
+		switch (game::Board::getInstance()->getEvent()) {
+			case(game::Board::KILLED_WAMPUS) :
+				std::cout << "You managed to defeat the Wumpus!!! You Win!!!" << std::endl;
+				std::cout << "[Press Any Key to Continue...]" << std::endl;
+				std::cin.ignore();
+				run = false;
+				break;
+			case(game::Board::ATE_BY_WAMPUS) :
+				std::cout << "You was eaten by a Wumpus!!! You Lose!!!" << std::endl;
+				std::cout << "[Press Any Key to Continue...]" << std::endl;
+				std::cin.ignore();
+				if (!GOD_MODE) {
+					run = false;
+				}
+				break;
+			case(game::Board::TELEPORTED) :
+				std::cout << "A large bat picked you up and moved you!!!!" << std::endl;
+				std::cout << "[Press Any Key to Continue...]" << std::endl;
+				std::cin.ignore();
+				break;
+			case(game::Board::TRIGGERED_TRAP) :
+				std::cout << "You was not paying attention and fell into a trap!!! You Lose!!!" << std::endl;
+				std::cout << "[Press Any Key to Continue...]" << std::endl;
+				std::cin.ignore();
+				if (!GOD_MODE) {
+					run = false;
+				}
+				break;
+			case(game::Board::GOT_ARROW) :
+				std::cout << "You found an Arrow!!" << std::endl;
+				std::cout << "[Press Any Key to Continue...]" << std::endl;
+				std::cin.ignore();
+				break;
+		}
 
+		if (!run) {
+			break;
+		}
 		//Movement
 		char direction = askDirection();
+		bool ret = false;
+		switch (direction) {
+			case 'w':
+			case 'W':
+				ret = game::Board::getInstance()->move(game::Board::PLAYER_ID, game::Board::NORTH);
+				break;
+			case 's':
+			case 'S':
+				ret = game::Board::getInstance()->move(game::Board::PLAYER_ID, game::Board::SOUTH);
+				break;
+			case 'a':
+			case 'A':
+				ret = game::Board::getInstance()->move(game::Board::PLAYER_ID, game::Board::WEST);
+				break;
+			case 'd':
+			case 'D':
+				ret = game::Board::getInstance()->move(game::Board::PLAYER_ID, game::Board::EAST);
+				break;
+		}
+
+		if (!ret && DEBUG) {
+			std::cout << "Could not move there" << std::endl;
+		}
 	} while (true);
 
 	

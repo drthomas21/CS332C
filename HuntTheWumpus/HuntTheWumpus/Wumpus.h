@@ -1,5 +1,6 @@
 #include "Piece.h"
-#pragma once
+#ifndef WUMPUS_H
+#define WUMPUS_H
 
 namespace game {
 	namespace pieces {
@@ -7,6 +8,8 @@ namespace game {
 		public:
 			Wumpus(int,char*);
 			void doAction(int);
+			char* const makeSound();
 		};
 	}
 }
+#endif //WUMPUS_H

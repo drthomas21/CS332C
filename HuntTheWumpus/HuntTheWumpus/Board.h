@@ -1,6 +1,7 @@
 #include "Piece.h"
 #include <string>
-#pragma once
+#ifndef BOARD_H
+#define BOARD_H
 
 namespace game {
 	struct Slot {
@@ -44,6 +45,7 @@ namespace game {
 		public:
 			//Singleton
 			static Board* getInstance();
+			static Board* reset();
 			static void setBoardSize(int);
 			static int const getSize();
 			static int const getRandomNum();
@@ -55,5 +57,7 @@ namespace game {
 			std::string printBoard(bool);
 			void setEvent(Board::EVENT_RESPONSE);
 			Board::EVENT_RESPONSE const getEvent();
+			std::string const nearBy(int);
 	};
 }
+#endif //BOARD_H

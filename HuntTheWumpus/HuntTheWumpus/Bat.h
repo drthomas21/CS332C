@@ -1,5 +1,6 @@
 #include "Piece.h"
-#pragma once
+#ifndef BAT_H
+#define BAT_H
 
 namespace game {
 	namespace pieces {
@@ -7,6 +8,8 @@ namespace game {
 		public:
 			Bat(int, char*);
 			void doAction(int);
+			char* const makeSound();
 		};
 	}
 }
+#endif //BAT_H

@@ -1,5 +1,6 @@
 #include "Piece.h"
-#pragma once
+#ifndef TRAP_H
+#define TRAP_H
 
 namespace game {
 	namespace pieces {
@@ -7,6 +8,8 @@ namespace game {
 		public:
 			Trap(int,char*);
 			void doAction(int);
+			char* const makeSound();
 		};
 	}
 }
+#endif //TRAP_H

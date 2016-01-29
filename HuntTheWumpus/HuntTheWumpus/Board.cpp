@@ -225,7 +225,7 @@ namespace game {
 		//Only set the previous spot to "empty_space" if the piece was originally there
 		//std::cout << "Old spot " << oldSlot.id << ":" << id << std::endl;
 		if (oldSlot != nullptr && oldSlot->id == id) {
-			oldSlot->id = Board::EMPTY_SPACE;
+			oldSlot->id = Board::DISCOVERED_SPACE;
 		}
 
 		//Set the id to the new location
@@ -337,11 +337,56 @@ namespace game {
 		return resp;
 	}
 
+	std::string const Board::nearBy(int id) {
+		Slot* slot = this->getSlot(id);
+		std::string response = "";
+
+		//Left
+		if (slot->x > 0 && this->slots[slot->x - 1][slot->y].id >= 0) {
+			if (response.length() > 0) {
+				response.append("\n");
+			}
+			response.append(this->pieces[this->slots[slot->x - 1][slot->y].id]->makeSound());
+		}
+
+		//Right
+		if (slot->x < Board::size - 1 && this->slots[slot->x + 1][slot->y].id >= 0) {
+			if (response.length() > 0) {
+				response.append("\n");
+			}
+			response.append(this->pieces[this->slots[slot->x + 1][slot->y].id]->makeSound());
+		}
+
+		//Above
+		if (slot->y > 0 && this->slots[slot->x][slot->y - 1].id >= 0) {
+			if (response.length() > 0) {
+				response.append("\n");
+			}
+			response.append(this->pieces[this->slots[slot->x][slot->y - 1].id]->makeSound());
+		}
+
+		//Below
+		if (slot->y < Board::size - 1 && this->slots[slot->x][slot->y + 1].id >= 0) {
+			if (response.length() > 0) {
+				response.append("\n");
+			}
+			response.append(this->pieces[this->slots[slot->x][slot->y + 1].id]->makeSound());
+		}
+
+		return response;
+	}
+
 	//Singleton
 	Board* Board::getInstance() {
 		if (!Board::Instance) {
 			Board::Instance = new Board;
 		}
+		return Board::Instance;
+	}
+
+	Board* Board::reset() {
+		delete [] Board::Instance;
+		Board::Instance = new Board;
 		return Board::Instance;
 	}
 

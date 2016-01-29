@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PIECE_H
+#define PIECE_H
 
 namespace game {
 	class Piece {
@@ -9,8 +10,10 @@ namespace game {
 			int id;
 		public:
 			Piece();
-			virtual char* getName() final;
+			virtual char* const getName() final;
 			virtual int const getId() final;
 			virtual void doAction(int);
+			virtual char* const makeSound();
 	};
 }
+#endif //PIECE_H

@@ -1,5 +1,6 @@
 #include "Piece.h"
-#pragma once
+#ifndef ARROW_H
+#define ARROW_H
 
 namespace game {
 	namespace pieces {
@@ -10,3 +11,4 @@ namespace game {
 		};
 	}
 }
+#endif //ARROW_H

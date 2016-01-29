@@ -1,5 +1,6 @@
 #include "Piece.h"
-#pragma once
+#ifndef PLAYER_H
+#define PLAYER_H
 
 namespace game {
 	namespace pieces {
@@ -10,3 +11,4 @@ namespace game {
 		};
 	}
 }
+#endif //PLAYER_H

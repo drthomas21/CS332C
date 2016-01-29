@@ -14,11 +14,15 @@ namespace game {
 		return this->id;
 	}
 
-	char* Piece::getName() {
+	char* const Piece::getName() {
 		return this->name;
 	}
 
 	void Piece::doAction(int id = 0) {
 		Board::getInstance()->setEvent(Board::NOTHING_HAPPENED);
+	}
+
+	char* const Piece::makeSound() {
+		return "";
 	}
 }

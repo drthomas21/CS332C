@@ -310,7 +310,7 @@ bool handleSave() {
 	bool ret = false;
 	try {
 		ret = FileManager::writeFile(FILENAME, game::Board::getInstance()->__serialize());
-	} catch (int e) {
+	} catch (FileManager::ERROR e) {
 		switch (e) {
 			case(FileManager::ERROR::FAILED_TO_ACCESS_FILE) :
 				std::cout << "Failed ot access file " << FILENAME << std::endl;
@@ -328,7 +328,7 @@ bool handleLoad() {
 	try {
 		serialized = FileManager::readFile(FILENAME);
 	}
-	catch (int e) {
+	catch (FileManager::ERROR e) {
 		switch (e) {
 			case(FileManager::ERROR::FAILED_TO_ACCESS_FILE) :
 				std::cout << "Failed ot access file " << FILENAME << std::endl;

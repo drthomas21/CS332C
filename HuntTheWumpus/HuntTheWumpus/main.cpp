@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "Trap.h"
 #include "Wumpus.h"
+#include "FileManager.h"
 
 const bool DEBUG = false;
 const bool GOD_MODE = false;
@@ -306,32 +307,38 @@ char askOption() {
 }
 
 bool handleSave() {
-	FILE* fres = nullptr;
-	fopen_s(&fres,FILENAME, "w+");
-	if (fres == NULL || fres == nullptr) {
-		std::cout << "Cannot access/create " << FILENAME << std::endl;
-		return false;
+	bool ret = false;
+	try {
+		ret = FileManager::writeFile(FILENAME, game::Board::getInstance()->__serialize());
+	} catch (int e) {
+		switch (e) {
+			case(FileManager::error_t::FAILED_TO_ACCESS_FILE) :
+				std::cout << "Failed ot access file " << FILENAME << std::endl;
+				break;
+			case(FileManager::error_t::FILE_NOT_FOUND) :
+				std::cout << "Cannot find file " << FILENAME << std::endl;
+				break;
+		}
 	}
-	fputs(game::Board::getInstance()->__serialize().c_str(), fres);
-	fclose(fres);
-	return true;
+	return ret;
 }
 
 bool handleLoad() {
-	const int bitLimit = 100;
-	char* buffered = new char[bitLimit];
 	std::string serialized = "";
-	FILE* fres = nullptr;
-	fopen_s(&fres, FILENAME, "r");
-	if (fres == NULL || fres==nullptr) {
-		std::cout << FILENAME << " does not exists" << std::endl;
-		return false;
+	try {
+		serialized = FileManager::readFile(FILENAME);
 	}
-	while (fgets(buffered, bitLimit, fres) != NULL) {
-		serialized.append(buffered);
+	catch (int e) {
+		switch (e) {
+			case(FileManager::error_t::FAILED_TO_ACCESS_FILE) :
+				std::cout << "Failed ot access file " << FILENAME << std::endl;
+				break;
+			case(FileManager::error_t::FILE_NOT_FOUND) :
+				std::cout << "Cannot find file " << FILENAME << std::endl;
+				break;
+		}
 	}
-	delete[] buffered;
-	fclose(fres);
+
 	if (!game::Board::getInstance()->__unserialize(serialized)) {
 		std::cout << "The game data was corrupted, please delete the file located at " << FILENAME << std::endl;
 		return false;

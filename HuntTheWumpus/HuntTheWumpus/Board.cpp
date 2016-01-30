@@ -405,6 +405,7 @@ namespace game {
 
 		//Rebuild everything
 		Board::size = size;
+		this->arrows = 5;
 		this->event = Board::NOTHING_HAPPENED;
 		this->slots = new Slot*[Board::size];
 		for (int x = 0; x < Board::size; x++) {

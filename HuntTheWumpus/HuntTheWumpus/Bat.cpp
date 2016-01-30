@@ -19,7 +19,7 @@ namespace game {
 			Board::getInstance()->setEvent(Board::TELEPORTED);
 		}
 
-		char* const Bat::makeSound() {
+		std::string const Bat::makeSound() {
 			return "You hear flapping nearby";
 		}
 	}

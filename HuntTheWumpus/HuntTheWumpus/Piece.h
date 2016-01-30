@@ -14,7 +14,7 @@ namespace game {
 			virtual std::string const getName() final;
 			virtual int const getId() final;
 			virtual void doAction(int);
-			virtual char* const makeSound();
+			virtual std::string const makeSound();
 	};
 }
 #endif //PIECE_H

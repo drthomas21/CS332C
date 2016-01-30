@@ -11,8 +11,6 @@ namespace game {
 
 		void Arrow::doAction(int id = 0) {
 			Board::getInstance()->setEvent(Board::GOT_ARROW);
-			//this->setPositionX(-1);
-			//this->setPositionY(-1);
 		}
 	}
 }

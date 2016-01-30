@@ -13,7 +13,7 @@ namespace game {
 			Board::getInstance()->setEvent(Board::ATE_BY_WAMPUS);
 		}
 
-		char* const Wumpus::makeSound() {
+		std::string const Wumpus::makeSound() {
 			return "You smell a foul stench nearby";
 		}
 	}

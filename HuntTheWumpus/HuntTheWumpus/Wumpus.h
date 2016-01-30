@@ -9,7 +9,7 @@ namespace game {
 		public:
 			Wumpus(int,std::string);
 			void doAction(int);
-			char* const makeSound();
+			std::string const makeSound();
 		};
 	}
 }

@@ -13,7 +13,7 @@ namespace game {
 			Board::getInstance()->setEvent(Board::TRIGGERED_TRAP);
 		}
 
-		char* const Trap::makeSound() {
+		std::string const Trap::makeSound() {
 			return "You feel a breeze nearby";
 		}
 	}

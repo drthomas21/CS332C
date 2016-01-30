@@ -23,7 +23,7 @@ namespace game {
 		Board::getInstance()->setEvent(Board::NOTHING_HAPPENED);
 	}
 
-	char* const Piece::makeSound() {
+	std::string const Piece::makeSound() {
 		return "";
 	}
 }

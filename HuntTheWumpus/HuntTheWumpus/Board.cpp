@@ -376,6 +376,41 @@ namespace game {
 		return response;
 	}
 
+	void Board::reset() {
+		//Delete pointers
+		for (int i = 0; i < Board::size; i++) {
+			delete[] this->slots[i];
+		}
+		delete[] this->slots;
+
+		for (int i = 0; i<this->players; i++) {
+			delete this->pieces[i];
+		}
+		delete[] this->pieces;
+
+		//Rebuild everything
+		this->event = Board::NOTHING_HAPPENED;
+		this->slots = new Slot*[Board::size];
+		for (int x = 0; x < Board::size; x++) {
+			this->slots[x] = new Slot[Board::size];
+			for (int y = 0; y < Board::size; y++) {
+				this->slots[x][y] = Slot{ x,y,Board::EMPTY_SPACE };
+			}
+		}
+		this->setUp();
+	}
+
+	std::string const Board::__serialize() {
+		std::string serialized = "";
+		//serialize pieces
+
+	}
+
+	bool const Board::__unserialize(std::string serialized) {
+		return true;
+	}
+
+
 	//Singleton
 	Board* Board::getInstance() {
 		if (!Board::Instance) {
@@ -384,12 +419,7 @@ namespace game {
 		return Board::Instance;
 	}
 
-	Board* Board::reset() {
-		delete [] Board::Instance;
-		Board::Instance = new Board;
-		return Board::Instance;
-	}
-
+	
 	void Board::setBoardSize(int size) {
 		if (Board::size == 0) {
 			Board::size = size;

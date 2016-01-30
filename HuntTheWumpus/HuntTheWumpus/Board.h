@@ -42,10 +42,11 @@ namespace game {
 			bool const moveWest(int);
 			Slot* const getSlot(int);
 			void setUp();
+
 		public:
 			//Singleton
 			static Board* getInstance();
-			static Board* reset();
+			
 			static void setBoardSize(int);
 			static int const getSize();
 			static int const getRandomNum();
@@ -58,6 +59,9 @@ namespace game {
 			void setEvent(Board::EVENT_RESPONSE);
 			Board::EVENT_RESPONSE const getEvent();
 			std::string const nearBy(int);
+			void reset();
+			std::string const __serialize();
+			bool const __unserialize(std::string);
 	};
 }
 #endif //BOARD_H

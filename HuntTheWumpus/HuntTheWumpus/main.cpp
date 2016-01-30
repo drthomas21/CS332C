@@ -65,13 +65,13 @@ int main() {
 			case(game::Board::KILLED_WAMPUS) :
 				std::cout << "You managed to defeat the Wumpus!!! You Win!!!" << std::endl;
 				std::cout << "[Press ENTER to Continue...]" << std::endl;
-				std::cin.ignore();
+				std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 				run = false;
 				break;
 			case(game::Board::ATE_BY_WAMPUS) :
 				std::cout << "You was eaten by a Wumpus!!! You Lose!!!" << std::endl;
 				std::cout << "[Press ENTER to Continue...]" << std::endl;
-				std::cin.ignore();
+				std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 				if (!GOD_MODE) {
 					run = false;
 				}
@@ -79,12 +79,12 @@ int main() {
 			case(game::Board::TELEPORTED) :
 				std::cout << "A large bat picked you up and moved you!!!!" << std::endl;
 				std::cout << "[Press ENTER to Continue...]" << std::endl;
-				std::cin.ignore();
+				std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 				break;
 			case(game::Board::TRIGGERED_TRAP) :
 				std::cout << "You was not paying attention and fell into a trap!!! You Lose!!!" << std::endl;
 				std::cout << "[Press ENTER to Continue...]" << std::endl;
-				std::cin.ignore();
+				std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 				if (!GOD_MODE) {
 					run = false;
 				}
@@ -92,7 +92,7 @@ int main() {
 			case(game::Board::GOT_ARROW) :
 				std::cout << "You found a magical Wumpus- Killing arrow!" << std::endl;
 				std::cout << "[Press ENTER to Continue...]" << std::endl;
-				std::cin.ignore();
+				std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 				break;
 		}
 
@@ -102,9 +102,7 @@ int main() {
 
 		//Check surrounding area
 		std::string sounds = game::Board::getInstance()->nearBy(game::Board::PLAYER_ID);
-		if (sounds.length() > 0) {
-			std::cout << sounds << std::endl;
-		}
+		std::cout << "Nearby: " << sounds << std::endl << std::endl;
 
 		//Movement
 		char direction = askDirection();
@@ -126,27 +124,27 @@ int main() {
 			case 'D':
 				ret = game::Board::getInstance()->move(game::Board::PLAYER_ID, game::Board::EAST);
 				break;
-			case('0') :
+			case('!') :
 				char option = askOption();
 				switch (option) {
-					case(0) :
+					case('!') :
 						continue;
 						break;
-					case(1) :
+					case('1') :
 						handleSave();
 						run = false;
 						break;
-					case(2) :
+					case('2') :
 						handleSave();
 						break;
-					case(3) :
+					case('3') :
 						handleLoad();
 						break;
-					case(4) :
+					case('4') :
 						run = false;
 						break;		
-					case(5) :
-						game::Board::reset();
+					case('5') :
+						game::Board::getInstance()->reset();
 						break;
 				}
 		}
@@ -166,13 +164,13 @@ char askDirection() {
 		<< "\n\ts) South"
 		<< "\n\td) East"
 		<< "\n\ta) West"
-		<< "\n\t0) Options"
+		<< "\n\t!) Options"
 		<< std::endl;
 	char choice;
 	std::cin >> choice;
 	std::cin.clear();
 	std::cin.ignore(std::numeric_limits<int>::max(), '\n');
-	if (choice != '0' && choice != 'w' && choice != 'a' && choice != 's' && choice != 'd' && choice != 'W' && choice != 'A' && choice != 'S' && choice != 'D') {
+	if (choice != '!' && choice != 'w' && choice != 'a' && choice != 's' && choice != 'd' && choice != 'W' && choice != 'A' && choice != 'S' && choice != 'D') {
 		return askDirection();
 	}
 	return choice;
@@ -185,13 +183,13 @@ char askOption() {
 		<< "\n\t3) Load"
 		<< "\n\t4) Exit Game"
 		<< "\n\t5) New Game"
-		<< "\n\t0) Leave Option Menu"
+		<< "\n\t!) Leave Option Menu"
 		<< std::endl;
 	char choice;
 	std::cin >> choice;
 	std::cin.clear();
 	std::cin.ignore(std::numeric_limits<int>::max(), '\n');
-	if (choice != '1' && choice != '2' && choice != '3' && choice != '4' && choice != '5' && choice != '0') {
+	if (choice != '1' && choice != '2' && choice != '3' && choice != '4' && choice != '5' && choice != '!') {
 		return askOption();
 	}
 	return choice;

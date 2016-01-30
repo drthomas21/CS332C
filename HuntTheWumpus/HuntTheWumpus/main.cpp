@@ -312,10 +312,10 @@ bool handleSave() {
 		ret = FileManager::writeFile(FILENAME, game::Board::getInstance()->__serialize());
 	} catch (int e) {
 		switch (e) {
-			case(FileManager::error_t::FAILED_TO_ACCESS_FILE) :
+			case(FileManager::ERROR::FAILED_TO_ACCESS_FILE) :
 				std::cout << "Failed ot access file " << FILENAME << std::endl;
 				break;
-			case(FileManager::error_t::FILE_NOT_FOUND) :
+			case(FileManager::ERROR::FILE_NOT_FOUND) :
 				std::cout << "Cannot find file " << FILENAME << std::endl;
 				break;
 		}
@@ -330,10 +330,10 @@ bool handleLoad() {
 	}
 	catch (int e) {
 		switch (e) {
-			case(FileManager::error_t::FAILED_TO_ACCESS_FILE) :
+			case(FileManager::ERROR::FAILED_TO_ACCESS_FILE) :
 				std::cout << "Failed ot access file " << FILENAME << std::endl;
 				break;
-			case(FileManager::error_t::FILE_NOT_FOUND) :
+			case(FileManager::ERROR::FILE_NOT_FOUND) :
 				std::cout << "Cannot find file " << FILENAME << std::endl;
 				break;
 		}

@@ -5,7 +5,7 @@
 
 class FileManager {
 public:
-	enum error_t {NO_ISSUE,FILE_NOT_FOUND,FAILED_TO_ACCESS_FILE};
+	enum ERROR {NO_ISSUE,FILE_NOT_FOUND,FAILED_TO_ACCESS_FILE};
 	static std::string const readFile(const char* );
 	static bool writeFile(const char*, const std::string);
 };

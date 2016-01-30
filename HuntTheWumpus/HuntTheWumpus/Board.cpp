@@ -7,6 +7,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <string>
+#include <sstream>
 #include <iostream>
 
 namespace game {
@@ -403,10 +404,79 @@ namespace game {
 	std::string const Board::__serialize() {
 		std::string serialized = "";
 		//serialize pieces
+		serialized.append("pieces_size="+std::to_string(this->players)+"\n");
+		for (int i = 0; i < this->players; i++) {
+			serialized.append("pieces={");
+			serialized.append(this->pieces[i]->getId()+",");
+			serialized.append(this->pieces[i]->getName());
+			serialized.append("}\n");
+		}
 
+		//serialized slots
+		serialized.append("slots_size=" + std::to_string(Board::size) + "\n");
+		for (int x = 0; x < Board::size; x++) {
+			for (int y = 0; y < Board::size; y++) {
+				serialized.append("slots={");
+				serialized.append(this->slots[x][y].x+ ",");
+				serialized.append(this->slots[x][y].y + ",");
+				serialized.append(std::to_string(this->slots[x][y].id));
+				serialized.append("}\n");
+			}
+		}
+
+		return serialized;
 	}
 
 	bool const Board::__unserialize(std::string serialized) {
+		//Delete pointers
+		for (int i = 0; i < Board::size; i++) {
+			delete[] this->slots[i];
+		}
+		delete[] this->slots;
+
+		for (int i = 0; i<this->players; i++) {
+			delete this->pieces[i];
+		}
+		delete[] this->pieces;
+
+		//Parse string
+		std::stringstream ss(serialized);
+		std::string line;
+		int pSize = 0;
+		int sSize = 0;
+
+		//Search for sizes only
+		while (std::getline(ss, line, '\n')) {
+			if (line.find("pieces_size") != std::string::npos) {
+				pSize = 0;
+			}
+
+			if (line.find("slots_size") != std::string::npos) {
+				sSize = 0;
+			}
+		}
+
+		if (pSize == 0 || sSize == 0) {
+			//Missing data
+			return false;
+		}
+
+		this->players = pSize;
+		Board::setBoardSize(sSize);
+
+		this->event = Board::NOTHING_HAPPENED;
+		this->pieces = new Piece*[this->players];
+		this->slots = new Slot*[Board::size];
+		for (int x = 0; x < Board::size; x++) {
+			this->slots[x] = new Slot[Board::size];
+			for (int y = 0; y < Board::size; y++) {
+				this->slots[x][y] = Slot{ x,y,Board::EMPTY_SPACE };
+			}
+		}
+
+		//Search String for object data;
+
+
 		return true;
 	}
 

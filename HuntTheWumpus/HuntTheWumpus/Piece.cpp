@@ -1,12 +1,13 @@
 #include "Piece.h"
 #include "Board.h"
+#include <string>
 
 namespace game {
 	Piece::Piece() {
 		this->id = 0;
 		this->name = "";
 	}
-	Piece::Piece(int id, char* name)
+	Piece::Piece(int id, std::string name)
 		:id(id),
 		name(name) {}
 
@@ -14,7 +15,7 @@ namespace game {
 		return this->id;
 	}
 
-	char* const Piece::getName() {
+	std::string const Piece::getName() {
 		return this->name;
 	}
 

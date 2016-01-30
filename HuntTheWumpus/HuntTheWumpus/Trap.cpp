@@ -1,9 +1,10 @@
 #include "Trap.h"
 #include "Board.h"
+#include <string>
 
 namespace game {
 	namespace pieces {
-		Trap::Trap(int i, char* name)
+		Trap::Trap(int i, std::string name)
 			:Piece(i, name) {
 
 		}

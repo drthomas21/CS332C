@@ -12,46 +12,29 @@
 #include "Wumpus.h"
 
 const bool DEBUG = false;
-const bool GOD_MODE = true;
+const bool GOD_MODE = false;
 const int SMALL = 7;
 const int MEDIUM = 14;
 const int LARGE = 30;
+const char* FILENAME = "./playerinfo.ini";
 
+int handleBoardSize();
 void displayBoard();
-void handleSave();
-void handleLoad();
+bool handleSave();
+bool handleLoad();
 char askDirection();
 char askOption();
+char askArrowDirection();
+int askArrowDistance();
 
 int main() {
 	//Setup
 	srand(static_cast<unsigned int>(time(NULL)));
-	char choice;
 
 	//Intro
 	std::cout << "Hunt The Wumpus!!!" << std::endl;
-	do {
-		std::cout << "Map Size?\n\ta) Small (" << SMALL << "x" << SMALL << ")\n\tb) Medium (" << MEDIUM << "x" << MEDIUM << ")\n\tc) Large (" << LARGE << "x" << LARGE << ")" << std::endl;
-		std::cin >> choice;
-		std::cin.clear();
-		std::cin.ignore(std::numeric_limits<int>::max(), '\n');
-	} while (choice != 'a' && choice != 'b' && choice != 'c' && choice != 'A' && choice != 'B' && choice != 'C');
-
-	//Game Setup
-	switch (choice) {
-		case('a') :
-		case('A') :
-			game::Board::setBoardSize(SMALL);
-			break;
-		case('b') :
-		case('B') :
-			game::Board::setBoardSize(MEDIUM);
-			break;
-		case('c') :
-		case('C') :
-			game::Board::setBoardSize(LARGE);
-			break;
-	}
+	int size = handleBoardSize();
+	game::Board::setBoardSize(size);
 
 	//Create Game Board
 	game::Board::getInstance();
@@ -60,14 +43,8 @@ int main() {
 		//Display Board
 		displayBoard();
 
-		//Check events
+		//Check movement events
 		switch (game::Board::getInstance()->getEvent()) {
-			case(game::Board::KILLED_WAMPUS) :
-				std::cout << "You managed to defeat the Wumpus!!! You Win!!!" << std::endl;
-				std::cout << "[Press ENTER to Continue...]" << std::endl;
-				std::cin.ignore(std::numeric_limits<int>::max(), '\n');
-				run = false;
-				break;
 			case(game::Board::ATE_BY_WAMPUS) :
 				std::cout << "You was eaten by a Wumpus!!! You Lose!!!" << std::endl;
 				std::cout << "[Press ENTER to Continue...]" << std::endl;
@@ -107,6 +84,9 @@ int main() {
 		//Movement
 		char direction = askDirection();
 		bool ret = false;
+		char _direction;
+		int distance;
+		game::Board::EVENT_RESPONSE event;
 		switch (direction) {
 			case 'w':
 			case 'W':
@@ -124,27 +104,94 @@ int main() {
 			case 'D':
 				ret = game::Board::getInstance()->move(game::Board::PLAYER_ID, game::Board::EAST);
 				break;
+			case '^':
+				_direction = askArrowDirection();
+				distance = askArrowDistance();
+				event = game::Board::EVENT_RESPONSE::NOTHING_HAPPENED;
+				switch (_direction) {
+					case 'w':
+					case 'W':
+						event = game::Board::getInstance()->shootArrow(game::Board::NORTH, distance);
+						break;
+					case 's':
+					case 'S':
+						event = game::Board::getInstance()->shootArrow(game::Board::SOUTH, distance);
+						break;
+					case 'a':
+					case 'A':
+						event = game::Board::getInstance()->shootArrow(game::Board::WEST, distance);
+						break;
+					case 'd':
+					case 'D':
+						event = game::Board::getInstance()->shootArrow(game::Board::EAST, distance);
+						break;
+				}
+
+				switch (event) {
+					case(game::Board::EVENT_RESPONSE::KILLED_WUMPUS) :
+						std::cout << "You manage to hit the Wumpus!!! You Win!!!" << std::endl;
+						std::cout << "[Press ENTER to Continue...]" << std::endl;
+						std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+						run = false;
+						break;
+					case(game::Board::EVENT_RESPONSE::MISSED_WUMPUS) :
+						std::cout << "You missed the Wumpus!!! Now the Wumpus moved out of rage!!!" << std::endl;
+						std::cout << "[Press ENTER to Continue...]" << std::endl;
+						std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+						break;
+					case(game::Board::EVENT_RESPONSE::NO_ARROWS_LEFT) :
+						std::cout << "You have no arrows left" << std::endl;
+						std::cout << "[Press ENTER to Continue...]" << std::endl;
+						std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+						break;
+				}
+				break;
 			case('!') :
 				char option = askOption();
 				switch (option) {
-					case('!') :
+				case('!') :
 						continue;
 						break;
 					case('1') :
-						handleSave();
+						if (handleSave()) {
+							std::cout << "Progress saved!" << std::endl;
+							std::cout << "[Press ENTER to Continue...]" << std::endl;
+							std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+						} else {
+							std::cout << "[Press ENTER to Continue...]" << std::endl;
+							std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+						}
 						run = false;
 						break;
 					case('2') :
-						handleSave();
+						if (handleSave()) {
+							std::cout << "Progress saved!" << std::endl;
+							std::cout << "[Press ENTER to Continue...]" << std::endl;
+							std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+						}
+						else {
+							std::cout << "[Press ENTER to Continue...]" << std::endl;
+							std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+						}
 						break;
 					case('3') :
-						handleLoad();
+						if (handleLoad()) {
+							std::cout << "Progress loaded!" << std::endl;
+							std::cout << "[Press ENTER to Continue...]" << std::endl;
+							std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+						}
+						else {
+							std::cout << "[Press ENTER to Continue...]" << std::endl;
+							std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+							run = false;
+						}
 						break;
 					case('4') :
 						run = false;
 						break;		
 					case('5') :
-						game::Board::getInstance()->reset();
+						int size = handleBoardSize();
+						game::Board::getInstance()->reset(size);
 						break;
 				}
 		}
@@ -156,6 +203,36 @@ int main() {
 void displayBoard() {
 	std::cout << game::Board::getInstance()->printBoard(!DEBUG) << std::endl;
 	std::cout << "P = Player, W = Wumpus, T = Trap, B = Bat, A = Arrow" << std::endl;
+	std::cout << "Arrows = " << game::Board::getInstance()->showArrowCount() << std::endl;
+}
+
+int handleBoardSize() {
+	char choice;
+	do {
+		std::cout << "Map Size?\n\ta) Small (" << SMALL << "x" << SMALL << ")\n\tb) Medium (" << MEDIUM << "x" << MEDIUM << ")\n\tc) Large (" << LARGE << "x" << LARGE << ")" << std::endl;
+		std::cin >> choice;
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+	} while (choice != 'a' && choice != 'b' && choice != 'c' && choice != 'A' && choice != 'B' && choice != 'C');
+
+	//Game Setup
+	switch (choice) {
+		case('a') :
+		case('A') :
+			return SMALL;
+			break;
+		case('b') :
+		case('B') :
+			return MEDIUM;
+			break;
+		case('c') :
+		case('C') :
+			return LARGE;
+			break;
+		default:
+			return SMALL;
+			break;
+	}
 }
 
 char askDirection() {
@@ -164,14 +241,47 @@ char askDirection() {
 		<< "\n\ts) South"
 		<< "\n\td) East"
 		<< "\n\ta) West"
+		<< "\n\t^) Shoot Arrow"
 		<< "\n\t!) Options"
 		<< std::endl;
 	char choice;
 	std::cin >> choice;
 	std::cin.clear();
 	std::cin.ignore(std::numeric_limits<int>::max(), '\n');
-	if (choice != '!' && choice != 'w' && choice != 'a' && choice != 's' && choice != 'd' && choice != 'W' && choice != 'A' && choice != 'S' && choice != 'D') {
+	if (choice != '^' && choice != '!' && choice != 'w' && choice != 'a' && choice != 's' && choice != 'd' && choice != 'W' && choice != 'A' && choice != 'S' && choice != 'D') {
 		return askDirection();
+	}
+	return choice;
+}
+
+char askArrowDirection() {
+	std::cout << "Where do you want to shoot the arrow?"
+		<< "\n\tw) North"
+		<< "\n\ts) South"
+		<< "\n\td) East"
+		<< "\n\ta) West"
+		<< std::endl;
+	char choice;
+	std::cin >> choice;
+	std::cin.clear();
+	std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+	if (choice != 'w' && choice != 'a' && choice != 's' && choice != 'd' && choice != 'W' && choice != 'A' && choice != 'S' && choice != 'D') {
+		return askArrowDirection();
+	}
+	return choice;
+}
+
+int askArrowDistance() {
+	std::cout << "How far do you want to shoot it (1 - 3 rooms)?" << std::endl;
+	int choice;
+	std::cin >> choice;
+	if (std::cin.fail()) {
+		choice = 0;		
+	}
+	std::cin.clear();
+	std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+	if (choice < 1 || choice > 3) {
+		return askArrowDirection();
 	}
 	return choice;
 }
@@ -195,10 +305,36 @@ char askOption() {
 	return choice;
 }
 
-void handleSave() {
-
+bool handleSave() {
+	FILE* fres = nullptr;
+	fopen_s(&fres,FILENAME, "w+");
+	if (fres == NULL || fres == nullptr) {
+		std::cout << "Cannot access/create " << FILENAME << std::endl;
+		return false;
+	}
+	fputs(game::Board::getInstance()->__serialize().c_str(), fres);
+	fclose(fres);
+	return true;
 }
 
-void handleLoad() {
-
+bool handleLoad() {
+	const int bitLimit = 100;
+	char* buffered = new char[bitLimit];
+	std::string serialized = "";
+	FILE* fres = nullptr;
+	fopen_s(&fres, FILENAME, "r");
+	if (fres == NULL || fres==nullptr) {
+		std::cout << FILENAME << " does not exists" << std::endl;
+		return false;
+	}
+	while (fgets(buffered, bitLimit, fres) != NULL) {
+		serialized.append(buffered);
+	}
+	delete[] buffered;
+	fclose(fres);
+	if (!game::Board::getInstance()->__unserialize(serialized)) {
+		std::cout << "The game data was corrupted, please delete the file located at " << FILENAME << std::endl;
+		return false;
+	}
+	return true;
 }

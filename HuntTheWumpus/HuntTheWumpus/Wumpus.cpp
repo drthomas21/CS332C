@@ -1,9 +1,10 @@
 #include "Wumpus.h"
 #include "Board.h"
+#include <string>
 
 namespace game {
 	namespace pieces {
-		Wumpus::Wumpus(int i, char* name)
+		Wumpus::Wumpus(int i, std::string name)
 			:Piece(i, name) {
 
 		}

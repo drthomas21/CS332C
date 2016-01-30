@@ -1,4 +1,5 @@
 #include "Piece.h"
+#include <string>
 #ifndef BAT_H
 #define BAT_H
 
@@ -6,7 +7,7 @@ namespace game {
 	namespace pieces {
 		class Bat : public Piece {
 		public:
-			Bat(int, char*);
+			Bat(int, std::string);
 			void doAction(int);
 			char* const makeSound();
 		};

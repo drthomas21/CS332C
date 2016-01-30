@@ -1,8 +1,9 @@
 #include "Player.h"
+#include <string>
 
 namespace game {
 	namespace pieces {
-		Player::Player(int i, char* n)
+		Player::Player(int i, std::string n)
 			: Piece(i, n) {
 
 		}

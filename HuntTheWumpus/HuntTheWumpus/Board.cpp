@@ -8,7 +8,6 @@
 #include <cstdlib>
 #include <string>
 #include <sstream>
-#include <iostream>
 
 namespace game {
 	//Static Variables
@@ -21,7 +20,14 @@ namespace game {
 		if (ret) {
 			if (this->slots[x][y].id != Board::EMPTY_SPACE && this->slots[x][y].id != Board::DISCOVERED_SPACE) {
 				//Toggle Event
-				this->pieces[this->slots[x][y].id]->doAction(oldSlot.id);
+				if (oldSlot.id == Board::WUMPUS_ID && this->slots[x][y].id != Board::PLAYER_ID) {
+					this->setEvent(Board::EVENT_RESPONSE::ITEM_DESTORYED);
+				} else if(oldSlot.id == Board::WUMPUS_ID && this->slots[x][y].id == Board::PLAYER_ID) {
+					this->pieces[oldSlot.id]->doAction(this->slots[x][y].id);
+				} else {
+					this->pieces[this->slots[x][y].id]->doAction(oldSlot.id);
+				}
+				
 				if (this->event != Board::GOT_ARROW && this->event != Board::NOTHING_HAPPENED) {
 					ret = false;
 				}
@@ -42,10 +48,12 @@ namespace game {
 		bool ret = false;
 		Slot* slot = this->getSlot(id);
 		int x, y;
+
+		//There is something funky going on if a slot does not exists
 		if (slot == nullptr) {
-			std::cout << "Piece does not exists" << std::endl;
 			exit(1);
 		}
+
 		x = slot->x, y = slot->y;
 		if (this->isValidLocation(*slot,x, y - 1)) {
 			this->placePiece(id, x, y - 1);
@@ -58,10 +66,12 @@ namespace game {
 		bool ret = false;
 		Slot* slot = this->getSlot(id);
 		int x, y;
+
+		//There is something funky going on if a slot does not exists
 		if (slot == nullptr) {
-			std::cout << "Piece does not exists" << std::endl;
 			exit(1);
 		}
+
 		x = slot->x, y = slot->y;
 		if (this->isValidLocation(*slot,x, y + 1)) {
 			this->placePiece(id, x, y + 1);
@@ -74,10 +84,12 @@ namespace game {
 		bool ret = false;
 		Slot* slot = this->getSlot(id);
 		int x, y;
+
+		//There is something funky going on if a slot does not exists
 		if (slot == nullptr) {
-			std::cout << "Piece does not exists" << std::endl;
 			exit(1);
 		}
+
 		x = slot->x, y = slot->y;
 		if (this->isValidLocation(*slot,x + 1, y)) {
 			this->placePiece(id, x + 1, y);
@@ -90,10 +102,12 @@ namespace game {
 		bool ret = false;
 		Slot* slot = this->getSlot(id);
 		int x, y;
+
+		//There is something funky going on if a slot does not exists
 		if (slot == nullptr) {
-			std::cout << "Piece does not exists" << std::endl;
 			exit(1);
 		}
+
 		x = slot->x, y = slot->y;
 		if (this->isValidLocation(*slot,x - 1, y)) {
 			this->placePiece(id, x - 1, y);
@@ -121,7 +135,7 @@ namespace game {
 
 		//Place the player
 		x = rand() % Board::size, y = rand() % Board::size;
-		this->pieces[0] = new pieces::Player(id, "You");
+		this->pieces[0] = new pieces::Player(id, "Player");
 		this->placePiece(id, x, y);
 		id++;
 
@@ -133,6 +147,7 @@ namespace game {
 		this->placePiece(id, x, y);
 		id++;
 		
+		//Setting some vars
 		int numOfTraps, numOfBats, numOfArrows;
 		if (this->players > 8) {
 			do {
@@ -224,8 +239,7 @@ namespace game {
 		Slot* oldSlot = this->getSlot(id);
 
 		//Only set the previous spot to "empty_space" if the piece was originally there
-		//std::cout << "Old spot " << oldSlot.id << ":" << id << std::endl;
-		if (oldSlot != nullptr && oldSlot->id == id) {
+		if (oldSlot != nullptr && oldSlot->id == id && id == Board::PLAYER_ID) {
 			oldSlot->id = Board::DISCOVERED_SPACE;
 		}
 
@@ -289,7 +303,7 @@ namespace game {
 						output.push_back(wumpus);
 						break;
 					default:
-						char *name = this->pieces[this->slots[x][y].id]->getName();
+						std::string name = this->pieces[this->slots[x][y].id]->getName();
 						switch (name[0]) {
 							case('B') :
 								output.append( "|");
@@ -377,7 +391,7 @@ namespace game {
 		return response;
 	}
 
-	void Board::reset() {
+	void Board::reset(int size = Board::size) {
 		//Delete pointers
 		for (int i = 0; i < Board::size; i++) {
 			delete[] this->slots[i];
@@ -390,6 +404,7 @@ namespace game {
 		delete[] this->pieces;
 
 		//Rebuild everything
+		Board::size = size;
 		this->event = Board::NOTHING_HAPPENED;
 		this->slots = new Slot*[Board::size];
 		for (int x = 0; x < Board::size; x++) {
@@ -403,24 +418,29 @@ namespace game {
 
 	std::string const Board::__serialize() {
 		std::string serialized = "";
+		//serialize arrows
+		serialized.append("arrows_count=" + std::to_string(this->arrows) + "\n");
+		serialized.append("\n");
+
 		//serialize pieces
 		serialized.append("pieces_size="+std::to_string(this->players)+"\n");
 		for (int i = 0; i < this->players; i++) {
-			serialized.append("pieces={");
-			serialized.append(this->pieces[i]->getId()+",");
+			serialized.append("pieces=");
+			serialized.append(std::to_string(this->pieces[i]->getId())+",");
 			serialized.append(this->pieces[i]->getName());
-			serialized.append("}\n");
+			serialized.append("\n");
 		}
+		serialized.append("\n");
 
 		//serialized slots
 		serialized.append("slots_size=" + std::to_string(Board::size) + "\n");
 		for (int x = 0; x < Board::size; x++) {
 			for (int y = 0; y < Board::size; y++) {
-				serialized.append("slots={");
-				serialized.append(this->slots[x][y].x+ ",");
-				serialized.append(this->slots[x][y].y + ",");
+				serialized.append("slots=");
+				serialized.append(std::to_string(this->slots[x][y].x)+ ",");
+				serialized.append(std::to_string(this->slots[x][y].y) + ",");
 				serialized.append(std::to_string(this->slots[x][y].id));
-				serialized.append("}\n");
+				serialized.append("\n");
 			}
 		}
 
@@ -448,23 +468,30 @@ namespace game {
 		//Search for sizes only
 		while (std::getline(ss, line, '\n')) {
 			if (line.find("pieces_size") != std::string::npos) {
-				pSize = 0;
+				pSize = stoi(line.substr(line.find("=")+1));
 			}
 
 			if (line.find("slots_size") != std::string::npos) {
-				sSize = 0;
+				sSize = stoi(line.substr(line.find("=") + 1));
+			}
+
+			if (line.find("arrows_count") != std::string::npos) {
+				this->arrows = stoi(line.substr(line.find("=") + 1));
 			}
 		}
 
-		if (pSize == 0 || sSize == 0) {
+		//Check if we have sizes for our arrays
+		if (pSize == 0 || sSize == 0 ) {
 			//Missing data
 			return false;
 		}
 
+		//Set some vars
 		this->players = pSize;
-		Board::setBoardSize(sSize);
-
+		Board::size = sSize;
 		this->event = Board::NOTHING_HAPPENED;
+
+		//Build arrays		
 		this->pieces = new Piece*[this->players];
 		this->slots = new Slot*[Board::size];
 		for (int x = 0; x < Board::size; x++) {
@@ -474,10 +501,147 @@ namespace game {
 			}
 		}
 
-		//Search String for object data;
+		//Reset stream;
+		ss.clear();	
+		ss.seekg(0, ss.beg);
 
+		//Search for objects only
+		int pCount = 0, sCount = 0;
+		while (std::getline(ss, line, '\n')) {
+			if (line.find("pieces=") != std::string::npos) {
+				pCount++;
+				std::string props = line.substr(line.find("=") + 1);
+				size_t index = 0;
+				int id = 0;
+				std::string name = "";
+				for (int i = 0; i < 2; i++) {
+					size_t start = index > 0 ? index + 1 : index;
+					index += 1;
+					index = props.find(",", index);
+					if (index == std::string::npos) {
+						index = props.length();
+					}
+					std::string prop = props.substr(start, index);
+					if (i == 0) {
+						id = stoi(prop);
+					}
+					else {
+						name = prop;
+					}
+				}
+
+				if (name.compare("Arrow") == 0) {
+					this->pieces[id] = new pieces::Arrow(id, name);
+				} else if (name.compare("Bat") == 0) {
+					this->pieces[id] = new pieces::Bat(id, name);
+				} else if (name.compare("Player") == 0) {
+					this->pieces[id] = new pieces::Player(id, name);
+				} else if (name.compare("Trap") == 0) {
+					this->pieces[id] = new pieces::Trap(id, name);
+				} else if (name.compare("Wumpus") == 0) {
+					this->pieces[id] = new pieces::Wumpus(id, name);
+				} else {
+					return false;
+				}				
+			}
+
+			if (line.find("slots=") != std::string::npos) {
+				sCount++;
+				std::string props = line.substr(line.find("=") + 1);
+				size_t index = 0;
+				int x = 0, y = 0, id = 0;
+				std::string name = "";
+				for (int i = 0; i < 3; i++) {
+					size_t start = index > 0 ? index + 1 : index;
+					index += 1;
+					index = props.find(",", index);
+					std::string prop = props.substr(start, index);
+					if (i == 0) {
+						x = stoi(prop);
+					} else if(i == 1) {
+						y = stoi(prop);
+					} else {
+						id = stoi(prop);
+					}
+				}
+
+				this->slots[x][y] = Slot{ x,y,id };
+			}
+		}
+
+		//Check if our counts are matching
+		if (pCount != this->players || sqrt(sCount) != Board::size) {
+			return false;
+		}
 
 		return true;
+	}
+
+	Board::EVENT_RESPONSE const Board::shootArrow(Board::DIRECTIONS direction, int distance) {
+		Slot slot = *this->getSlot(Board::PLAYER_ID);
+		if (this->arrows > 0) {
+			this->arrows--;
+			int adj_x = 0, adj_y = 0;
+			switch (direction) {
+				case(Board::DIRECTIONS::NORTH) :
+					adj_y = -1;
+					break;
+				case(Board::DIRECTIONS::SOUTH) :
+					adj_y = 1;
+					break;
+				case(Board::DIRECTIONS::WEST) :
+					adj_x = -1;
+					break;
+				case(Board::DIRECTIONS::EAST) :
+					adj_x = 1;
+					break;
+			}
+
+			int x = slot.x; int y = slot.y;
+			for (int i = 0; i < distance; i++) {
+				x += adj_x, y += adj_y;
+				if (x >= 0 && x < Board::size && y >= 0 && y < Board::size && this->slots[x][y].id == Board::IDS::WUMPUS_ID) {
+					return Board::EVENT_RESPONSE::KILLED_WUMPUS;
+				}
+			}
+
+			//Wumpus was startled, so he moved
+			switch (rand() % 4) {
+				case(0):
+					if (this->move(Board::WUMPUS_ID, game::Board::NORTH)) {
+						break;
+					}
+				case(1):
+					if (this->move(Board::WUMPUS_ID, game::Board::SOUTH)) {
+						break;
+					}
+				case(2):
+					if (this->move(Board::WUMPUS_ID, game::Board::EAST)) {
+						break;
+					}
+				case(3):
+					if (this->move(Board::WUMPUS_ID, game::Board::WEST)) {
+						break;
+					}
+				default:
+					if (!this->move(Board::WUMPUS_ID, game::Board::NORTH)) {
+						this->move(Board::WUMPUS_ID, game::Board::SOUTH);
+					}
+					break;
+
+			}
+			return Board::EVENT_RESPONSE::MISSED_WUMPUS;
+		}
+
+		return Board::EVENT_RESPONSE::NO_ARROWS_LEFT ;
+	}
+
+	void Board::pickupArrow() {
+		this->arrows++;
+	}
+
+	int const Board::showArrowCount() {
+		return this->arrows;
 	}
 
 
@@ -511,6 +675,7 @@ namespace game {
 	
 	//Constructors
 	Board::Board() {
+		this->arrows = 5;
 		this->event = Board::NOTHING_HAPPENED;
 		this->slots = new Slot*[Board::size];
 		for (int x = 0; x < Board::size; x++) {

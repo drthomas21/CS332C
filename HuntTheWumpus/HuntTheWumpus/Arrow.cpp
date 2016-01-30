@@ -1,9 +1,10 @@
 #include "Arrow.h"
 #include "Board.h"
+#include <string>
 
 namespace game {
 	namespace pieces {
-		Arrow::Arrow(int i, char* name) 
+		Arrow::Arrow(int i, std::string name) 
 			:Piece(i,name) {
 
 		}

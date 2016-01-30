@@ -1,9 +1,10 @@
 #include "Bat.h"
 #include "Board.h"
+#include <string>
 
 namespace game {
 	namespace pieces {
-		Bat::Bat(int i, char* name)
+		Bat::Bat(int i, std::string name)
 			:Piece(i, name) {
 
 		}

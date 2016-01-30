@@ -14,7 +14,7 @@ namespace game {
 		public:
 			//Constants
 			enum IDS { EMPTY_SPACE = -10, DISCOVERED_SPACE, PLAYER_ID = 0, WUMPUS_ID = 1 };
-			enum EVENT_RESPONSE { NOTHING_HAPPENED, KILLED_WAMPUS, ATE_BY_WAMPUS, TELEPORTED, TRIGGERED_TRAP, GOT_ARROW };
+			enum EVENT_RESPONSE { NOTHING_HAPPENED, NO_ARROWS_LEFT, MISSED_WUMPUS, KILLED_WUMPUS, ATE_BY_WAMPUS, TELEPORTED, TRIGGERED_TRAP, GOT_ARROW,ITEM_DESTORYED };
 			enum DIRECTIONS { NORTH, WEST, SOUTH, EAST };
 
 		private:
@@ -25,6 +25,7 @@ namespace game {
 			//Variables
 			static int size;
 			int players;
+			int arrows;
 			Slot** slots;
 			Piece** pieces;
 			Board::EVENT_RESPONSE event;
@@ -59,9 +60,12 @@ namespace game {
 			void setEvent(Board::EVENT_RESPONSE);
 			Board::EVENT_RESPONSE const getEvent();
 			std::string const nearBy(int);
-			void reset();
+			void reset(int);
 			std::string const __serialize();
 			bool const __unserialize(std::string);
+			Board::EVENT_RESPONSE const shootArrow(Board::DIRECTIONS,int);
+			void pickupArrow();
+			int const showArrowCount();
 	};
 }
 #endif //BOARD_H

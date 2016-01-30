@@ -10,7 +10,7 @@ std::string const FileManager::readFile(const char* filename) {
 	std::string serialized = "";
 	FILE* fres = nullptr;
 
-#ifdef linux
+#ifndef _WIN32
 	fres = fopen(filename, "r");
 #endif
 
@@ -34,7 +34,7 @@ std::string const FileManager::readFile(const char* filename) {
 bool FileManager::writeFile(const char* filename, const std::string message) {
 	FILE* fres = nullptr;
 
-#ifdef linux
+#ifndef _WIN32
 	fres = fopen(filename, "w+");
 #endif
 

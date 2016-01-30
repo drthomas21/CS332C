@@ -318,6 +318,9 @@ bool handleSave() {
 			case(FileManager::ERROR::FILE_NOT_FOUND) :
 				std::cout << "Cannot find file " << FILENAME << std::endl;
 				break;
+			case(FileManager::ERROR::FAILD_TO_WRITE_TO_FILE) :
+				std::cout << "Cannot write to " << FILENAME << std::endl;
+				break;
 		}
 	}
 	return ret;

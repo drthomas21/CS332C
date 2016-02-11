@@ -145,7 +145,7 @@ std::istream &operator>>(std::istream  &input, Polynomial &source) {
 	for (int i = source.size-1; i >= 0; i--) {
 		char value[100];
 		input >> value;
-		if (!atof(value)) {
+		if (!atof(value) && value[0] != '0') {
 			std::cout << "Invalid value" << std::endl;
 			i++;
 			continue;

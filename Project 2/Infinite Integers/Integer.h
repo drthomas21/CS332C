@@ -6,6 +6,7 @@
 namespace project {
 	class Integer {
 		private:
+			const char digits[10] = { '0','1','2','3','4','5','6','7','8','9' };
 			std::string number;
 			bool isPositive;
 		public:
@@ -25,9 +26,9 @@ namespace project {
 			Integer operator +(const Integer&) const;
 			Integer operator -(const Integer&) const;
 			Integer operator *(const Integer&) const;
-			Integer operator +=(const Integer&) const;
-			Integer operator -=(const Integer&) const;
-			Integer operator *=(const Integer&) const;
+			void operator +=(const Integer&);
+			void operator -=(const Integer&);
+			void operator *=(const Integer&);
 
 			bool operator >(const Integer&) const;
 			bool operator <(const Integer&) const;
@@ -43,8 +44,8 @@ namespace project {
 
 			int operator[](int);
 
-			friend std::ostream& operator <<(std::ostream& outputStream, const Integer&);
-			friend std::istream& operator >>(std::istream& inputStream, Integer&);
+			friend std::ostream& operator <<(std::ostream&, const Integer&);
+			friend std::istream& operator >>(std::istream&, Integer&);
 	};
 }
 #endif

@@ -129,7 +129,7 @@ Integer Integer::operator*(const Integer &source) const {
 	Integer newInt;
 	newInt.number = "";
 	newInt.isPositive = this->isPositive == source.isPositive;
-	for (size_t i = 0; i < (this->number.length() + source.number.length()); i++) {
+	for (size_t i = 0; i < (this->number.length() + source.number.length() + 1); i++) {
 		newInt.number.push_back('0');
 	}
 	int remainder = 0;
@@ -150,8 +150,13 @@ Integer Integer::operator*(const Integer &source) const {
 			newInt.number[i + j] = Integer::digits[static_cast<size_t>(item1 % 10)];
 		}
 
-		if (remainder > 0) {
-			newInt.number.insert(0, std::to_string(remainder));
+		while (remainder > 0) {
+			j--;
+
+			int item1 = newInt.number[i + j] - ASCII_TO_INT_OFFSET;
+			item1 += remainder;
+			remainder = static_cast<int>(floor(item1 / 10));
+			newInt.number[i + j] = Integer::digits[static_cast<size_t>(item1 % 10)];
 		}
 	}
 

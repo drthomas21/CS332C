@@ -9,6 +9,7 @@ private:
 	std::string number;
 	bool isPositive;
 public:
+	~Integer();
 	Integer();
 	Integer(const Integer&);
 	Integer(int);
@@ -26,7 +27,7 @@ public:
 	void operator -=(const Integer&);
 	void operator *=(const Integer&);
 
-	size_t length();
+	size_t length() const;
 
 	bool operator >(const Integer&) const;
 	bool operator <(const Integer&) const;

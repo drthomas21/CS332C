@@ -4,7 +4,7 @@
 
 //Public functions
 const unsigned int ASCII_TO_INT_OFFSET = 48;
-size_t Integer::length() {
+size_t Integer::length() const {
 	return this->number.length();
 }
 
@@ -62,7 +62,9 @@ Integer Integer::operator+(const Integer &source) const {
 Integer Integer::operator-(const Integer &source) const {
 	// 30 - (-10) == 30 + 10
 	Integer _source(source);
+	
 	_source.isPositive = !_source.isPositive;
+	
 	if (this->isPositive == _source.isPositive) {
 		return (*this) + _source;
 	}
@@ -83,7 +85,10 @@ Integer Integer::operator-(const Integer &source) const {
 		sourceStr.insert(0, "0");
 	}
 
-	if (*this > _source) {
+
+	Integer _this(*this);
+	_this.isPositive = _source.isPositive = true;
+	if (_this > _source) {
 		newInt.isPositive = this->isPositive;
 		size_t i = maxLength;
 		while (i > 0) {
@@ -93,17 +98,20 @@ Integer Integer::operator-(const Integer &source) const {
 			int item2 = sourceStr[i] - ASCII_TO_INT_OFFSET;
 			int n = 0;
 
-			if (item1 < item2 || (carryover == 1 && item1 == item2)) {
+			if (item1 < item2 || (carryover > 0 && item1 == item2)) {
+				if (carryover > 0) {
+					item1 -= 1;
+				}
 				carryover = 1;
 				item1 += 10;
 			} else if(carryover > 0) {
-				item1 -= 1;
+				item1 -= carryover;
 				carryover = 0;
 			}
-			newInt.number.insert(0, std::to_string(item1 - item2));
+			newInt.number.insert(0, std::to_string((item1 - item2) % 10));
 		}
 	} else {
-		newInt.isPositive = !this->isPositive;
+		newInt.isPositive = !source.isPositive;
 		size_t i = maxLength;
 		while (i > 0) {
 			i--;
@@ -111,16 +119,20 @@ Integer Integer::operator-(const Integer &source) const {
 			int item1 = selfStr[i] - ASCII_TO_INT_OFFSET;
 			int item2 = sourceStr[i] - ASCII_TO_INT_OFFSET;
 			int n = 0;
-			if (item1 > item2 || (carryover == 1 && item1 == item2)) {
+			if (item1 > item2 || (carryover > 0 && item1 == item2)) {
+				if (carryover > 0) {
+					item2 -= 1;
+				}
 				carryover = 1;
 				item2 += 10;
 			} else if (carryover > 0) {
-				item2 -= 1;
+				item2 -= carryover;
 				carryover = 0;
 			}
-			newInt.number.insert(0, std::to_string(item2 - item1));
+			newInt.number.insert(0, std::to_string((item2 - item1) % 10));
 		}
 	}
+
 
 	return newInt;
 }
@@ -129,7 +141,8 @@ Integer Integer::operator*(const Integer &source) const {
 	Integer newInt;
 	newInt.number = "";
 	newInt.isPositive = this->isPositive == source.isPositive;
-	for (size_t i = 0; i < (this->number.length() + source.number.length() + 1); i++) {
+	unsigned int shift = 1;
+	for (size_t i = 0; i < (this->number.length() + source.number.length()); i++) {
 		newInt.number.push_back('0');
 	}
 	int remainder = 0;
@@ -141,22 +154,22 @@ Integer Integer::operator*(const Integer &source) const {
 		size_t j = source.number.length();
 		while (j > 0) {
 			j--;
-
-			int item1 = newInt.number[i + j] - ASCII_TO_INT_OFFSET;
+			
+			int item1 = newInt.number[i + j + shift] - ASCII_TO_INT_OFFSET;
 			int item2 = this->number[i] - ASCII_TO_INT_OFFSET;
 			int item3 = source.number[j] - ASCII_TO_INT_OFFSET;
 			item1 += item2*item3 + remainder;
 			remainder = static_cast<int>(floor(item1 / 10));
-			newInt.number[i + j] = Integer::digits[static_cast<size_t>(item1 % 10)];
+			newInt.number[i + j + shift] = Integer::digits[static_cast<size_t>(item1 % 10)];
 		}
 
 		while (remainder > 0) {
 			j--;
 
-			int item1 = newInt.number[i + j] - ASCII_TO_INT_OFFSET;
+			int item1 = newInt.number[i + j + shift] - ASCII_TO_INT_OFFSET;
 			item1 += remainder;
 			remainder = static_cast<int>(floor(item1 / 10));
-			newInt.number[i + j] = Integer::digits[static_cast<size_t>(item1 % 10)];
+			newInt.number[i + j + shift] = Integer::digits[static_cast<size_t>(item1 % 10)];
 		}
 	}
 
@@ -193,70 +206,173 @@ void Integer::operator*=(const Integer &source) {
 }
 
 bool Integer::operator>(const Integer &source) const {
-	bool ret = this->number.length() > source.number.length();
-	if (!ret && this->number.length() == source.number.length()) {
-		for (size_t i = 0; i < this->number.length(); i++) {
-			ret = (this->number[i] - ASCII_TO_INT_OFFSET) <(source.number[i] - ASCII_TO_INT_OFFSET);
+	// -3 > -5 == 3 < 5
+	if (this->isPositive == false && source.isPositive == false) {
+		Integer _source(source);
+		Integer _this(*this);
+
+		_source.isPositive = true;
+		_this.isPositive = true;
+
+		return _this < _source;
+	} else if (this->isPositive != source.isPositive) {
+		return this->isPositive;
+	}
+
+	//Removes fluff
+	Integer _source(source);
+	Integer _this(*this);
+
+	bool ret = _this.number.length() > _source.number.length();
+	if (!ret && _this.number.length() == _source.number.length()) {
+		for (size_t i = 0; i < _this.number.length(); i++) {
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) >(_source.number[i] - ASCII_TO_INT_OFFSET);
 			if (ret) {
 				break;
 			}
+
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) < (_source.number[i] - ASCII_TO_INT_OFFSET);
+			if (ret) {
+				ret = !ret;
+				break;
+			} else {
+				ret = false;
+			}
 		}
-		ret = !ret;
 	}
 
-	return ret;
+	return ret && _this.isPositive == _source.isPositive;
 }
 
 bool Integer::operator<(const Integer &source) const {
-	bool ret = this->number.length() < source.number.length();
-	if (!ret && this->number.length() == source.number.length()) {
-		for (size_t i = 0; i < this->number.length(); i++) {
-			ret = (this->number[i] - ASCII_TO_INT_OFFSET) >(source.number[i] - ASCII_TO_INT_OFFSET);
-			if (ret) {
-				break;
-			}
-		}
-		ret = !ret;
+	// -3 < -5 == 3 > 5
+	if (this->isPositive == false && source.isPositive == false) {
+		Integer _source(source);
+		Integer _this(*this);
+
+		_source.isPositive = true;
+		_this.isPositive = true;
+
+		return _this > _source;
+	} else if (this->isPositive != source.isPositive) {
+		return !this->isPositive;
 	}
 
-	return ret;
+	//Removes fluff
+	Integer _source(source);
+	Integer _this(*this);
+
+	bool ret = _this.number.length() < _source.number.length();
+	if (!ret && _this.number.length() == _source.number.length()) {
+		for (size_t i = 0; i < _this.number.length(); i++) {
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) >(_source.number[i] - ASCII_TO_INT_OFFSET);
+			if (ret) {
+				ret = !ret;
+				break;
+			}
+
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) < (_source.number[i] - ASCII_TO_INT_OFFSET);
+			if (ret) {
+				break;
+			} else {
+				ret = false;
+			}
+		}
+	}
+
+	return ret && _this.isPositive == _source.isPositive;
 }
 
 bool Integer::operator>=(const Integer &source) const {
-	bool ret = this->number.length() > source.number.length();
-	if (!ret && this->number.length() == source.number.length()) {
-		for (size_t i = 0; i < this->number.length(); i++) {
-			ret = (this->number[i] - ASCII_TO_INT_OFFSET) < (source.number[i] - ASCII_TO_INT_OFFSET);
-			if (!ret) {
+	// -3 >= -5 == 3 <= 5
+	if (this->isPositive == false && source.isPositive == false) {
+		Integer _source(source);
+		Integer _this(*this);
+
+		_source.isPositive = true;
+		_this.isPositive = true;
+
+		return _this <= _source;
+	} else if (this->isPositive != source.isPositive) {
+		return this->isPositive;
+	}
+
+	//Removes fluff
+	Integer _source(source);
+	Integer _this(*this);
+
+	bool ret = _this.number.length() > _source.number.length();
+	if (!ret && _this.number.length() == _source.number.length()) {
+		for (size_t i = 0; i < _this.number.length(); i++) {
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) > (_source.number[i] - ASCII_TO_INT_OFFSET);
+			if (ret) {
 				break;
 			}
+
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) < (_source.number[i] - ASCII_TO_INT_OFFSET);
+			if (ret) {
+				ret = !ret;
+				break;
+			} else {
+				ret = true;
+			}
 		}
-		ret = !ret;
 	}
 
 	return ret;
 }
 
 bool Integer::operator<=(const Integer &source) const {
-	bool ret = this->number.length() < source.number.length();
-	if (!ret && this->number.length() == source.number.length()) {
-		for (size_t i = 0; i < this->number.length(); i++) {
-			ret = (this->number[i] - ASCII_TO_INT_OFFSET) >(source.number[i] - ASCII_TO_INT_OFFSET);
+	// -3 <= -5 == 3 >= 5
+	if(this->isPositive == false && source.isPositive == false) {
+		Integer _source(source);
+		Integer _this(*this);
+
+		_source.isPositive = true;
+		_this.isPositive = true;
+
+		return _this >= _source;
+	} else if (this->isPositive != source.isPositive) {
+		return !this->isPositive;
+	}
+	//Removes fluff
+	Integer _source(source);
+	Integer _this(*this);
+
+	bool ret = _this.number.length() < _source.number.length();
+	if (!ret && _this.number.length() == _source.number.length()) {
+		for (size_t i = 0; i < _this.number.length(); i++) {
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) >(_source.number[i] - ASCII_TO_INT_OFFSET);
 			if (ret) {
+				ret = !ret;
 				break;
 			}
+
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) < (_source.number[i] - ASCII_TO_INT_OFFSET);
+			if (ret) {				
+				break;
+			} else {
+				ret = true;
+			}
 		}
-		ret = !ret;
 	}
 
 	return ret;
 }
 
 bool Integer::operator==(const Integer &source) const {
-	bool ret = this->number.length() == source.number.length();
+	if (this->isPositive != source.isPositive) {
+		return false;
+	}
+
+	//Removes fluff
+	Integer _source(source);
+	Integer _this(*this);
+
+	bool ret = _this.number.length() == _source.number.length();
 	if (ret) {
-		for (size_t i = 0; i < this->number.length(); i++) {
-			ret = (this->number[i] - ASCII_TO_INT_OFFSET) == (source.number[i] - ASCII_TO_INT_OFFSET);
+		for (size_t i = 0; i < _this.number.length(); i++) {
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) == (_source.number[i] - ASCII_TO_INT_OFFSET);
 			if (!ret) {
 				break;
 			}
@@ -267,15 +383,22 @@ bool Integer::operator==(const Integer &source) const {
 }
 
 bool Integer::operator!=(const Integer &source) const {
-	bool ret = this->number.length() != source.number.length();
+	if (this->isPositive != source.isPositive) {
+		return true;
+	}
+
+	//Removes fluff
+	Integer _source(source);
+	Integer _this(*this);
+
+	bool ret = _this.number.length() != _source.number.length();
 	if (!ret) {
-		for (size_t i = 0; i < this->number.length(); i++) {
-			ret = (this->number[i] - ASCII_TO_INT_OFFSET) == (source.number[i] - ASCII_TO_INT_OFFSET);
-			if (!ret) {
+		for (size_t i = 0; i < _this.number.length(); i++) {
+			ret = (_this.number[i] - ASCII_TO_INT_OFFSET) != (_source.number[i] - ASCII_TO_INT_OFFSET);
+			if (ret) {
 				break;
 			}
 		}
-		ret = !ret;
 	}
 
 	return ret;
@@ -369,7 +492,13 @@ std::istream &operator>>(std::istream &inputStream, Integer &source) {
 //Constructors
 Integer::Integer() :number("0"), isPositive(true) { }
 
-Integer::Integer(const Integer &source) : number(source.number), isPositive(source.isPositive) { }
+Integer::Integer(const Integer &source) : number(source.number), isPositive(source.isPositive) {
+	std::string formatted = this->number;
+	while (formatted.length() > 1 && formatted[0] == '0') {
+		formatted.erase(0, 1);
+	}
+	this->number = formatted;
+}
 
 Integer::Integer(int num) {
 	this->isPositive = true;
@@ -410,7 +539,12 @@ Integer::Integer(std::string num) {
 		this->isPositive = true;
 		this->number = "0";
 	}
-	
+
+	std::string formatted = this->number;
+	while (formatted.length() > 1 && formatted[0] == '0') {
+		formatted.erase(0, 1);
+	}
+	this->number = formatted;	
 }
 
 Integer::Integer(char* num, int size) {
@@ -425,6 +559,16 @@ Integer::Integer(char* num, int size) {
 			this->isPositive = true;
 			this->number = "0";
 		}
+
+		std::string formatted = this->number;
+		while (formatted.length() > 1 && formatted[0] == '0') {
+			formatted.erase(0, 1);
+		}
+		this->number = formatted;
 	}
 	
+}
+
+Integer::~Integer() {
+	this->number.clear();
 }

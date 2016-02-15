@@ -8,6 +8,7 @@
 int main() {
 	srand(static_cast<unsigned int>(time(NULL)));	
 
+
 	std::cout << "Positive Nums" << std::endl;
 	Integer obj0;
 	std::cout << "Ojbect 0 - Empty: " << obj0 << std::endl;
@@ -92,24 +93,29 @@ int main() {
 
 	//------------------------------------
 	std::cout << std::endl;
+	
+	for (int i = 0; i < 20; i++) {
+		int num1 = rand();
+		int num2 = rand();
 
-	for (int i = 0; i < 10; i++) {
-		Integer a(rand());
-		Integer b(rand());
+		if (rand() % 2 == 0) {
+			num1 *= -1;
+		}
+
+		if (rand() % 2 == 0) {
+			num2 *= -1;
+		}
+
+		Integer a(num1);
+		Integer b(num2);
 
 		int choice = rand() % 3;
 		if (choice == 0) {
-			std::cout << a << " + " << b << " = ";
-			Integer c = a + b;
-			std::cout << c << std::endl;
+			std::cout << a << " + " << b << " = " << (a + b) << std::endl;
 		} else if(choice == 1) {
-			std::cout << a << " - " << b << " = ";
-			Integer c = a - b;
-			std::cout << c << std::endl;
+			std::cout << a << " - " << b << " = " << (a - b) << std::endl;
 		} else {
-			std::cout << a << " x " << b << " = ";
-			Integer c = a * b;
-			std::cout << c << std::endl;
+			std::cout << a << " x " << b << " = " << (a * b) << std::endl;
 		}
 	}
 
@@ -126,17 +132,31 @@ int main() {
 	std::cout << "Object 30 - Post Desc: " << obj30 << std::endl;
 	--obj30;
 	std::cout << "Object 30 - Pre Desc: " << obj30 << std::endl;
-
+	
 	//------------------------------------
 	std::cout << std::endl;
 
-	for (int i = 0; i < 20; i++) {
-		Integer a(rand() % 5);
-		Integer b(rand() % 5);
+	for (int i = 0; i < 10; i++) {
+		int num1 = rand();
+		int num2 = rand();
 
-		std::cout << "Is " << a << " > " << b << "? " << (a > b ? "Is Greater" : (a < b ? "Is Lesser" : (a == b ? "Is Equal" : "Epic Failure")));
-		std::cout << "Is " << a << " >= " << b << "? " << (a >= b ? "Is Greater Or Equal" : (a <= b ? "Is Lesser Or Equal" : "Epic Failure"));
-		std::cout << "Is " << a << " != " << b << "? " << (a != b ? "Not Same" : (a == b ? "The Same" : "Epic Failure"));
+		if (rand() % 2 == 0) {
+			num1 *= -1;
+		}
+
+		if (rand() % 2 == 0) {
+			num2 *= -1;
+		}
+
+		Integer a(num1);
+		Integer b(num2);
+
+		std::cout << "Is " << a << " > " << b << "? " << (a > b ? "Yes" : "No") << std::endl;
+		std::cout << "Is " << a << " < " << b << "? " << (a < b ? "Yes" : "No") << std::endl;
+		std::cout << "Is " << a << " >= " << b << "? " << (a >= b ? "Yes" : "No") << std::endl;
+		std::cout << "Is " << a << " <= " << b << "? " << (a <= b ? "Yes" : "No") << std::endl;
+		std::cout << "Is " << a << " == " << b << "? " << (a == b ? "Yes" : "No") << std::endl;
+		std::cout << "Is " << a << " != " << b << "? " << (a != b ? "Yes" : "No") << std::endl;
 		std::cout << std::endl;
 	}
 
@@ -155,4 +175,6 @@ int main() {
 		std::cout << "Object 40 - Loop - Char at " << i << ": " << value << std::endl;
 		i++;
 	}
+
+	return 0;
 }

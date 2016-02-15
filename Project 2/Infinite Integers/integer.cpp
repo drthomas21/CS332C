@@ -1,4 +1,4 @@
-#include "Integer.h"
+#include "integer.h"
 #include <math.h>
 #include <limits>
 

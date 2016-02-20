@@ -173,7 +173,7 @@ MySet::MySet() {
 	this->bitset = nullptr;
 }
 
-MySet::MySet(const std::vector<int> &nums) {
+MySet::MySet(std::vector<int> &nums) {
 	this->size = 3;
 	if (this->bitset != nullptr) {
 		delete[] this->bitset;
@@ -183,8 +183,8 @@ MySet::MySet(const std::vector<int> &nums) {
 		this->bitset[i] = 0;
 	}
 	
-	for (size_t i = 0; i < nums.size(); i++) {
-		this->insert(nums[i]);
+	for (std::vector<int>::iterator num = nums.begin(); num != nums.end(); ++num) {
+		this->insert(*num);
 	}
 }
 

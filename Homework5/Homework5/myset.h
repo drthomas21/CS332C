@@ -10,7 +10,7 @@ private:
 public:
 	MySet();
 	~MySet();
-	MySet(const std::vector<int>&);
+	MySet(std::vector<int>&);
 	MySet(const MySet&);
 
 	void insert(int);

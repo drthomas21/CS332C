@@ -1,7 +1,7 @@
 #ifndef MYSET_H
 #define MYSET_H
 #include <vector>
-#include <iostream>
+#include <ostream>
 
 class MySet {
 private:	
@@ -10,7 +10,7 @@ private:
 public:
 	MySet();
 	~MySet();
-	MySet(std::vector<int>&);
+	MySet(const std::vector<int>&);
 	MySet(const MySet&);
 
 	void insert(int);

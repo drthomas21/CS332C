@@ -8,11 +8,12 @@ const unsigned int BITSET_LIMIT = 32;
 
 void MySet::insert(int num) {
 	unsigned int _num = static_cast<unsigned int>(num);
-	if (_num >= BITSET_LIMIT * this->size) {
+	size_t setIndex = static_cast<size_t>(floor(_num / BITSET_LIMIT));
+	if (setIndex >= this->size) {
 		unsigned int* _list = this->bitset;
 		size_t size = this->size;
 
-		this->size = static_cast<size_t>(ceil(num / BITSET_LIMIT));
+		this->size = static_cast<size_t>(ceil(_num / BITSET_LIMIT)) + 1;
 		this->bitset = new unsigned int[this->size];
 
 		for (size_t i = 0; i < size; i++) {
@@ -26,21 +27,21 @@ void MySet::insert(int num) {
 		}
 	}
 
-	size_t setIndex = static_cast<size_t>(floor(num / BITSET_LIMIT));
-	size_t setOffset = static_cast<size_t>(num - (BITSET_LIMIT * setIndex));
-	unsigned int item = 1 << static_cast<unsigned int>(num - (BITSET_LIMIT * setIndex));
-	this->bitset[setIndex] = this->bitset[setIndex] | item;
+	size_t setOffset = static_cast<size_t>(_num - (BITSET_LIMIT * setIndex));
+	unsigned int item = 1 << static_cast<unsigned int>(_num - (BITSET_LIMIT * setIndex));
+	this->bitset[setIndex] = (this->bitset[setIndex] | item);
 }
 
 void MySet::remove(int num) {
-	if (num >= static_cast<int>(BITSET_LIMIT * this->size)) {
+	unsigned int _num = static_cast<unsigned int>(num);
+	size_t setIndex = static_cast<size_t>(floor(_num / BITSET_LIMIT));
+	if (_num >= this->size) {
 		return;
 	}
-
-	size_t setIndex = static_cast<size_t>(floor(num / BITSET_LIMIT));
-	size_t setOffset = static_cast<size_t>(num - (BITSET_LIMIT * setIndex));
-	unsigned int item = 1 << static_cast<unsigned int>(num - (BITSET_LIMIT * setIndex));
-	this->bitset[setIndex] = this->bitset[setIndex] & ~item;
+	
+	size_t setOffset = static_cast<size_t>(_num - (BITSET_LIMIT * setIndex));
+	unsigned int item = 1 << static_cast<unsigned int>(_num - (BITSET_LIMIT * setIndex));
+	this->bitset[setIndex] = (this->bitset[setIndex] & ~item);
 }
 
 void MySet::operator=(const MySet &source) {
@@ -53,6 +54,7 @@ void MySet::operator=(const MySet &source) {
 		this->bitset[i] = source.bitset[i];
 	}
 }
+
 MySet MySet::operator+(const MySet &source) const {
 	MySet newSet;
 	size_t maxSize = this->size > source.size ? this->size : source.size;
@@ -171,15 +173,18 @@ MySet::MySet() {
 	this->bitset = nullptr;
 }
 
-MySet::MySet(std::vector<int> &nums) {
+MySet::MySet(const std::vector<int> &nums) {
 	this->size = 3;
+	if (this->bitset != nullptr) {
+		delete[] this->bitset;
+	}
 	this->bitset = new unsigned int[this->size];
 	for (size_t i = 0; i < this->size; i++) {
 		this->bitset[i] = 0;
 	}
 	
-	for (std::vector<int>::iterator num = nums.begin(); num != nums.end(); ++num) {
-		this->insert(*num);
+	for (size_t i = 0; i < nums.size(); i++) {
+		this->insert(nums[i]);
 	}
 }
 
@@ -189,7 +194,7 @@ MySet::MySet(const MySet &source) {
 		delete[] this->bitset;
 	}
 	this->bitset = new unsigned int[this->size];
-	for (size_t i = 0; i < source.size; i++) {
+	for (size_t i = 0; i < this->size; i++) {
 		this->bitset[i] = source.bitset[i];
 	}
 }

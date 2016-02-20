@@ -10,7 +10,7 @@ void MySet::insert(int num) {
 	unsigned int _num = static_cast<unsigned int>(num);
 	size_t setIndex = static_cast<size_t>(floor(_num / BITSET_LIMIT));
 	if (setIndex >= this->size) {
-		unsigned int* _list = this->bitset;
+		unsigned int *_list = this->bitset;
 		size_t size = this->size;
 
 		this->size = static_cast<size_t>(ceil(_num / BITSET_LIMIT)) + 1;
@@ -20,7 +20,6 @@ void MySet::insert(int num) {
 			this->bitset[i] = _list[i];
 		}
 		delete[] _list;
-		_list = nullptr;
 
 		for (size_t i = size; i < this->size; i++) {
 			this->bitset[i] = 0;
@@ -175,10 +174,8 @@ MySet::MySet() {
 
 MySet::MySet(std::vector<int> &nums) {
 	this->size = 3;
-	if (this->bitset != nullptr) {
-		delete[] this->bitset;
-	}
 	this->bitset = new unsigned int[this->size];
+
 	for (size_t i = 0; i < this->size; i++) {
 		this->bitset[i] = 0;
 	}
@@ -190,10 +187,8 @@ MySet::MySet(std::vector<int> &nums) {
 
 MySet::MySet(const MySet &source) {
 	this->size = source.size;
-	if (this->bitset != nullptr) {
-		delete[] this->bitset;
-	}
 	this->bitset = new unsigned int[this->size];
+
 	for (size_t i = 0; i < this->size; i++) {
 		this->bitset[i] = source.bitset[i];
 	}

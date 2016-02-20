@@ -58,18 +58,15 @@ int main() {
 
 	//Add
 	std::cout << "Set 3 + Set 2: ";
-	MySet _temp1 = obj3 + obj2;
-	std::cout << _temp1 << std::endl << std::endl;
+	std::cout << (obj3 + obj2) << std::endl << std::endl;
 
 	//Sub
 	std::cout << "Set 3 - Set 2: ";
-	MySet _temp2 = obj3 - obj2;
-	std::cout << _temp2 << std::endl << std::endl;
+	std::cout << (obj3 - obj2) << std::endl << std::endl;
 
 	//Intersect
 	std::cout << "Set 3 & Set 2: ";
-	MySet _temp3 = obj3 & obj2;
-	std::cout << _temp3 << std::endl << std::endl;
+	std::cout << (obj3 & obj2) << std::endl << std::endl;
 
 	//Equals
 	std::cout << "Set 3 == Set 2: ";

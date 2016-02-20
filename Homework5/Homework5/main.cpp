@@ -6,7 +6,7 @@
 #include <cstdlib>
 
 int main() {
-	srand(static_cast<size_t>(time(NULL)));
+	srand(static_cast<unsigned int>(time(NULL)));
 	std::vector<int> set1(10,0);
 	set1[9] = 31;
 	set1[8] = 30;
@@ -23,51 +23,21 @@ int main() {
 	std::cout << "Set 1: " << obj1 << std::endl << std::endl;
 
 	//Insert
-	int randNum = rand() % 1000;
-	std::cout << "Lets insert " << randNum << " into the set";
-	obj1.insert(randNum);
-	std::cout << obj1 << std::endl << std::endl;
-
-	randNum = rand() % 1000;
-	std::cout << "Lets insert " << randNum << " into the set";
-	obj1.insert(randNum);
-	std::cout << obj1 << std::endl << std::endl;
-
-	randNum = rand() % 1000;
-	std::cout << "Lets insert " << randNum << " into the set";
-	obj1.insert(randNum);
-	std::cout << obj1 << std::endl << std::endl;
-
-	randNum = rand() % 1000;
-	std::cout << "Lets insert " << randNum << " into the set";
-	obj1.insert(randNum);
-	std::cout << obj1 << std::endl << std::endl;
-
-	randNum = rand() % 1000;
-	std::cout << "Lets insert " << randNum << " into the set";
-	obj1.insert(randNum);
-	std::cout << obj1 << std::endl << std::endl;
+	for (int i = 0; i < 5; i++) {
+		int randNum = rand() % 5;
+		std::cout << "Lets insert " << randNum << " into the set";
+		obj1.insert(randNum);
+		std::cout << obj1 << std::endl << std::endl;
+	}
 
 	//Remove
-	randNum = rand() % 1000;
-	std::cout << "Lets remove " << randNum << " into the set";
-	obj1.remove(randNum);
-	std::cout << obj1 << std::endl << std::endl;
-
-	randNum = rand() % 1000;
-	std::cout << "Lets remove " << randNum << " into the set";
-	obj1.remove(randNum);
-	std::cout << obj1 << std::endl << std::endl;
-
-	randNum = rand() % 1000;
-	std::cout << "Lets remove " << randNum << " into the set";
-	obj1.remove(randNum);
-	std::cout << obj1 << std::endl << std::endl;
-
-	randNum = rand() % 1000;
-	std::cout << "Lets remove " << randNum << " into the set";
-	obj1.remove(randNum);
-	std::cout << obj1 << std::endl << std::endl;
+	for (int i = 0; i < 5; i++) {
+		int randNum = rand() % 5;
+		std::cout << "Lets remove " << randNum << " into the set";
+		obj1.remove(randNum);
+		std::cout << obj1 << std::endl << std::endl;
+	}
+	
 
 	//New Set
 	std::vector<int> set2(30,0);
@@ -75,7 +45,7 @@ int main() {
 		set2[i] = rand() % 1000;
 	}
 	MySet obj2(set2);
-	std::cout << "Set 2: " << obj2;
+	std::cout << "Set 2: " << obj2 << std::endl;
 
 	//Add
 	std::cout << "Set 1 + Set 2: ";
@@ -84,11 +54,13 @@ int main() {
 
 	//Sub
 	std::cout << "Set 1 - Set 2: ";
-	_temp1 = obj1 - obj2;
-	std::cout << _temp1 << std::endl;
+	MySet _temp2 = obj1 - obj2;
+	std::cout << _temp2 << std::endl;
 
 	//Intersect
-	std::cout << "Set 1 - Set 2: ";
-	_temp1 = obj1 & obj2;
-	std::cout << _temp1 << std::endl;
+	std::cout << "Set 1 & Set 2: ";
+	MySet _temp3 = obj1 & obj2;
+	std::cout << _temp3 << std::endl;
+
+	return 0;
 }

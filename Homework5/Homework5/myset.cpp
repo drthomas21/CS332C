@@ -6,7 +6,8 @@
 const unsigned int BITSET_LIMIT = 32;
 
 void MySet::insert(int num) {
-	if (num >= static_cast<int>(BITSET_LIMIT * this->size)) {
+	unsigned int _num = static_cast<unsigned int>(num);
+	if (_num >= BITSET_LIMIT * this->size) {
 		unsigned int* _list = this->bitset;
 		size_t size = this->size;
 
@@ -55,6 +56,9 @@ MySet MySet::operator+(const MySet &source) const {
 	MySet newSet;
 	size_t maxSize = this->size > source.size ? this->size : source.size;
 	newSet.size = maxSize;
+	if (newSet.bitset != nullptr) {
+		delete[] newSet.bitset;
+	}
 	newSet.bitset = new unsigned int[maxSize];
 
 	for (size_t i = 0; i < maxSize; i++) {
@@ -78,6 +82,9 @@ MySet MySet::operator-(const MySet &source) const {
 	MySet newSet;
 	size_t maxSize = this->size > source.size ? this->size : source.size;
 	newSet.size = maxSize;
+	if (newSet.bitset != nullptr) {
+		delete[] newSet.bitset;
+	}
 	newSet.bitset = new unsigned int[maxSize];
 
 	for (size_t i = 0; i < maxSize; i++) {
@@ -101,6 +108,9 @@ MySet MySet::operator&(const MySet &source) const {
 	MySet newSet;
 	size_t maxSize = this->size > source.size ? this->size : source.size;
 	newSet.size = maxSize;
+	if (newSet.bitset != nullptr) {
+		delete[] newSet.bitset;
+	}
 	newSet.bitset = new unsigned int[maxSize];
 
 	for (size_t i = 0; i < maxSize; i++) {
@@ -157,7 +167,7 @@ std::ostream& operator<<(std::ostream &output, const MySet &source) {
 
 MySet::MySet() {
 	this->size = 0;
-	this->bitset = new unsigned int[this->size];
+	this->bitset = nullptr;
 }
 
 MySet::MySet(std::vector<int> &nums) {

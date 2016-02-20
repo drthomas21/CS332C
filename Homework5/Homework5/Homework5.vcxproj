@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3090C7DC-B4B7-42DF-9FFB-BE158311F047}</ProjectGuid>
+    <ProjectGuid>{FCB1E546-E2B5-4BB1-AFCF-A164DF531984}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Homework5</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>

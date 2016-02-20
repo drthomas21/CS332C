@@ -1,6 +1,7 @@
 #include "myset.h"
 #include <vector>
 #include <iostream>
+#include <cmath>
 
 //Public functions
 const unsigned int BITSET_LIMIT = 32;

@@ -23,16 +23,16 @@ int main() {
 	std::cout << "Set 1: " << obj1 << std::endl << std::endl;
 
 	//Insert
-	for (int i = 0; i < 5; i++) {
-		int randNum = rand() % 5;
+	for (int i = 0; i < 20; i++) {
+		int randNum = rand() % 1000;
 		std::cout << "Lets insert " << randNum << " into the set";
 		obj1.insert(randNum);
 		std::cout << obj1 << std::endl << std::endl;
 	}
 
 	//Remove
-	for (int i = 0; i < 5; i++) {
-		int randNum = rand() % 5;
+	for (int i = 0; i < 20; i++) {
+		int randNum = rand() % 20;
 		std::cout << "Lets remove " << randNum << " into the set";
 		obj1.remove(randNum);
 		std::cout << obj1 << std::endl << std::endl;

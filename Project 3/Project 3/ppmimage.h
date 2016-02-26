@@ -10,7 +10,9 @@ private:
 	unsigned int height;
 	unsigned int maxColor;
 	unsigned char* colors;
-	unsigned int numOfChars;
+	unsigned int* getRGB(size_t); unsigned int* getRGB(size_t);
+	void setRGB(size_t, unsigned int*);
+
 public:
 	static const char EOL = '\n';
 	PPMImage();
@@ -25,5 +27,7 @@ public:
 	void grayscale();
 	void sepia();
 	void negative();
+	size_t getSize();
+	
 };
 #endif

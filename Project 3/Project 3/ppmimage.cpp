@@ -14,8 +14,7 @@ std::istream& operator>>(std::istream &input, PPMImage &source) {
 		delete[] source.colors;
 	}
 
-	source.numOfChars = ceil(source.maxColor / pow(2, sizeof(unsigned char) * 8));
-	source.colors = new unsigned char[static_cast<size_t>(source.width * source.height * source.numOfChars)];
+	source.colors = new unsigned char[source.getSize() ];
 	input >> source.colors;
 }
 
@@ -31,14 +30,14 @@ void PPMImage::hideData(const std::string &message) {
 	_message.push_back('\0');
 	unsigned int charSize = sizeof(unsigned char);
 
-	if (this->width * this->height * this->numOfChars >= _message.size() * charSize) {
-		size_t offset = this->numOfChars - 1;
+	if (this->getSize() >= _message.size() * charSize) {
+		size_t offset = 0;
 		for (size_t i = 0; i < _message.size(); i++) {
 			size_t shift = charSize;
 			while (shift > 0) {
 				shift--;
 
-				offset += this->numOfChars;
+				offset += 1;
 				unsigned char binary = 1;
 				unsigned char item = _message[i] & (binary << shift);
 				this->colors[offset] = this->colors[offset] | item;
@@ -51,8 +50,8 @@ void PPMImage::hideData(const std::string &message) {
 
 std::string PPMImage::recoverData() {
 	std::string message = "";
-	unsigned int offset = this->numOfChars - 1;
-	unsigned int size = this->width * this->height * this->numOfChars;
+	unsigned int offset = 0;
+	unsigned int size = this->getSize();
 
 	
 	unsigned char character = 0;
@@ -62,7 +61,7 @@ std::string PPMImage::recoverData() {
 		binaryChar = 0;
 
 		while (offset < size && shift > 0) {
-			offset += this->numOfChars;
+			offset += 1;
 			shift--;
 
 			unsigned char binary = 1;
@@ -80,5 +79,137 @@ std::string PPMImage::recoverData() {
 }
 
 void PPMImage::grayscale() {
+	for (size_t i = 0; i < this->getSize(); i += 3) {
+		unsigned int *rgb = this->getRGB(i);
 
+		if (rgb != nullptr) {
+			unsigned int newRgb[3] = { 0,0,0 };
+			double multiplier[3] = { .299 , .587, .114 };
+			unsigned int colorValue = 0;
+
+			for (size_t i = 0; i < 3; i++) {
+				colorValue += static_cast<unsigned int>(rgb[i] * multiplier[i]);
+			}
+
+			for (size_t i = 0; i < 3; i++) {
+				int binary = rgb[i] & 1;
+				newRgb[i] = colorValue;
+				newRgb[i] = newRgb[i] | binary;
+			}
+			this->setRGB(i, newRgb);
+			delete[] rgb;
+		}
+	}
+}
+
+void PPMImage::sepia() {
+	for (size_t i = 0; i < this->getSize(); i += 3) {
+		unsigned int *rgb = this->getRGB(i);
+
+		if (rgb != nullptr) {
+			unsigned int newRgb[3] = { 0,0,0 };
+
+			double multiplier[3][3] = { 
+				{ .393 , .769, .189 },
+				{ .349 , .686, .168 },
+				{ .272 , .534, .131 }
+			};
+			unsigned int colorValues[3] = { 0,0,0 };
+
+			for (size_t i = 0; i < 3; i++) {
+				for (size_t j = 0; j < 3; j++) {
+					colorValues[i] += static_cast<unsigned int>(rgb[j] * multiplier[i][j]);
+				}
+			}
+
+			for (size_t i = 0; i < 3; i++) {
+				int binary = rgb[i] & 1;
+				newRgb[i] = colorValues[i];
+				newRgb[i] = newRgb[i] | binary;
+			}
+			this->setRGB(i, newRgb);
+			delete[] rgb;
+		}
+	}
+}
+
+void PPMImage::negative() {
+	for (size_t i = 0; i < this->getSize(); i += 3) {
+		unsigned int *rgb = this->getRGB(i);
+
+		if (rgb != nullptr) {
+			unsigned int newRgb[3] = { 0,0,0 };
+			unsigned int colorValues[3] = { 0,0,0 };
+
+			for (size_t i = 0; i < 3; i++) {
+				colorValues[i] += static_cast<unsigned int>(255 - rgb[i]);
+			}
+
+			for (size_t i = 0; i < 3; i++) {
+				int binary = rgb[i] & 1;
+				newRgb[i] = colorValues[i];
+				newRgb[i] = newRgb[i] | binary;
+			}
+			this->setRGB(i, newRgb);
+			delete[] rgb;
+		}
+	}
+}
+
+size_t PPMImage::getSize() {
+	return static_cast<size_t>(this->width * this->height);
+}
+
+unsigned int* PPMImage::getRGB(size_t index) {
+	unsigned int *colors = nullptr;
+	if (index % 3 == 0) {
+		colors = new unsigned int[3];
+		colors[0] = 0;
+		colors[1] = 0;
+		colors[2] = 0;
+
+		for (size_t i = 0; i < 3; i++) {
+			colors[i] = colors[i] | this->colors[i + index];
+		}
+	}
+
+	return colors;
+}
+
+void PPMImage::setRGB(size_t index, unsigned int* rgb) {
+	if (index % 3 == 0) {
+		for (size_t i = 0; i < 3; i++) {
+			this->colors[i + index] = rgb[i] & (1 >> sizeof(unsigned int) - sizeof(char));			
+		}
+	}
+}
+
+PPMImage::PPMImage() {
+
+}
+PPMImage::PPMImage(const PPMImage& source) {
+	if (this->colors != nullptr) {
+		delete[] this->colors;
+	}
+
+	this->colors = source.colors;
+	this->magicNumber = source.magicNumber;
+	this->height = source.height;
+	this->width = source.width;
+	this->maxColor = source.maxColor;
+
+}
+PPMImage::~PPMImage() {
+	delete[] this->colors;
+}
+PPMImage PPMImage::operator=(const PPMImage& source) {
+	if (this->colors != nullptr) {
+		delete[] this->colors;
+	}
+
+	this->colors = source.colors;
+	this->magicNumber = source.magicNumber;
+	this->height = source.height;
+	this->width = source.width;
+	this->maxColor = source.maxColor;
 }

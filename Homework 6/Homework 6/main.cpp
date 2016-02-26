@@ -42,5 +42,10 @@ int main() {
 
 	std::cout << "[" << index << "]: ";
 	list[index]->print();
+
+	for (size_t i = 0; i < SIZE; i++) {
+		delete list[i];
+	}
+	delete[] list;
 	return 0;
 }

@@ -2,6 +2,7 @@
 #define PPMIMAGE_H
 #include <string>
 #include <iostream>
+#include <stdint.h>
 
 class PPMImage {
 private:
@@ -10,8 +11,8 @@ private:
 	unsigned int height;
 	unsigned int maxColor;
 	unsigned char* colors;
-	unsigned int* getRGB(size_t); unsigned int* getRGB(size_t);
-	void setRGB(size_t, unsigned int*);
+	std::uint8_t* getRGB(size_t);
+	void setRGB(size_t, std::uint8_t*);
 
 public:
 	static const char EOL = '\n';
@@ -27,7 +28,7 @@ public:
 	void grayscale();
 	void sepia();
 	void negative();
-	size_t getSize();
+	size_t getSize() const;
 	
 };
 #endif

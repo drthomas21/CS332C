@@ -12,6 +12,8 @@
 const char PPMImage::MESSAGE_PREFIX[PPMImage::PREFIX_SIZE] = { 'M','s','g' };
 
 std::istream& operator>>(std::istream &input, PPMImage &source) {
+	std::cout << "Reading file..." << std::endl;
+
 	input >> source.magicNumber >> source.width >> source.height >> source.maxColor;
 
 	if (source.colors != nullptr) {
@@ -30,18 +32,16 @@ std::istream& operator>>(std::istream &input, PPMImage &source) {
 }
 
 std::ostream& operator<<(std::ostream &output, const PPMImage &source) {
+	std::cout << "Writing to file..." << std::endl;
+
 	output << source.magicNumber << PPMImage::EOL;
 	output << source.width << " " << source.height << PPMImage::EOL;
 	output << source.maxColor << PPMImage::EOL;
 	
-	char *_unsignedChars = new char[source.getSize()];
 	for (size_t i = 0; i < source.getSize(); i++) {
-		_unsignedChars[i] = source.colors[i];
+		output << source.colors[i];
 	}
-
-	output.write(_unsignedChars, source.getSize());
 	
-	delete[] _unsignedChars;
 	return output;
 }
 
@@ -215,7 +215,7 @@ size_t PPMImage::getSize() const {
 }
 
 std::uint8_t* PPMImage::getRGB(size_t index) {
-	std::uint8_t *colors = nullptr;
+	static std::uint8_t *colors = nullptr;
 	if (index % 3 == 0) {
 		colors = new std::uint8_t[3];
 		colors[0] = 0;

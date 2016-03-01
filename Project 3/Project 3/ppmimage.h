@@ -16,6 +16,8 @@ private:
 
 public:
 	static const char EOL = '\n';
+	static const int PREFIX_SIZE = 3;
+	static const char MESSAGE_PREFIX[PREFIX_SIZE];
 	PPMImage();
 	PPMImage(const PPMImage&);
 	~PPMImage();

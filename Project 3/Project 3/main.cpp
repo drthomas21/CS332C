@@ -29,6 +29,7 @@ int main() {
 		if (iFilename.empty()) {
 			std::cout << "Please name the image that you would like to work with: ";
 			std::cin >> iFilename;
+			std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 
 			//Check if file exists
 			std::ifstream fileReader;
@@ -76,6 +77,7 @@ int main() {
 			<< "\t3) Exit" << std::endl
 			<< "?";
 		std::cin >> choice;
+		std::cin.ignore(std::numeric_limits<int>::max(), '\n');
 
 		switch (choice) {
 			case 'A':
@@ -83,10 +85,11 @@ int main() {
 				message.clear();
 				while (message.empty()) {
 					std::cout << "What message? ";
-					std::cin >> message;
+					std::cin.clear();
+					std::getline(std::cin, message);
 					try {
 						image.hideData(message);
-						std::cout << "Message hidden" << std::endl;
+						std::cout << "Message hidden" << std::endl << std::endl;
 					} catch (int e) {
 						if (e == FAILED_MESSAGE_TOO_LAGER) {
 							std::cout << "Message was too large, try again" << std::endl;
@@ -105,25 +108,29 @@ int main() {
 				}
 				catch (int e) {
 					if (e == FAILED_MESSAGE_NOT_FOUND) {
-						std::cout << "The image did not have an image" << std::endl;
+						std::cout << "The image did not have a message" << std::endl;
 						message.clear();
 					}
 				}
+				std::cout << std::endl;
 				break;
 
 			case 'C':
 			case 'c':
 				image.sepia();
+				std::cout << "Applied Sepia" << std::endl << std::endl;
 				break;
 
 			case 'D':
 			case 'd':
 				image.grayscale();
+				std::cout << "Applied Greyscale" << std::endl << std::endl;
 				break;
 
 			case 'E':
 			case 'e':
 				image.negative();
+				std::cout << "Applied Negative" << std::endl << std::endl;
 				break;
 
 			case '1':

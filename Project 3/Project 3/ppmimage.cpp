@@ -4,6 +4,13 @@
 #include <cmath>
 #include <stdint.h>
 
+#define FAILED_READ_IMAGE 101
+#define FAILED_WRITE_IMAGE 102
+#define FAILED_MESSAGE_TOO_LAGER 201
+#define FAILED_MESSAGE_NOT_FOUND 202
+
+const char PPMImage::MESSAGE_PREFIX[PPMImage::PREFIX_SIZE] = { 'M','s','g' };
+
 std::istream& operator>>(std::istream &input, PPMImage &source) {
 	input >> source.magicNumber >> source.width >> source.height >> source.maxColor;
 
@@ -16,7 +23,7 @@ std::istream& operator>>(std::istream &input, PPMImage &source) {
 	input.seekg(source.getSize()*-1, input.end);
 	input.read(_unsignedChars, source.getSize());
 	for (size_t i = 0; i < source.getSize(); i++) {
-		source.colors[i] = static_cast<unsigned char>(_unsignedChars[i]);
+		source.colors[i] =_unsignedChars[i];
 	}
 	delete[] _unsignedChars;
 	return input;
@@ -26,64 +33,101 @@ std::ostream& operator<<(std::ostream &output, const PPMImage &source) {
 	output << source.magicNumber << PPMImage::EOL;
 	output << source.width << " " << source.height << PPMImage::EOL;
 	output << source.maxColor << PPMImage::EOL;
-	for (size_t i = 0; i < source.getSize(); i++) {
-		output << source.colors[i];
-	}
-	output << PPMImage::EOL;
 	
+	char *_unsignedChars = new char[source.getSize()];
+	for (size_t i = 0; i < source.getSize(); i++) {
+		_unsignedChars[i] = source.colors[i];
+	}
+
+	output.write(_unsignedChars, source.getSize());
+	
+	delete[] _unsignedChars;
 	return output;
 }
 
 void PPMImage::hideData(const std::string &message) {
 	std::string _message = message;
-	_message.push_back('\0');
-	unsigned int charSize = sizeof(unsigned char);
+	unsigned int charSize = sizeof(unsigned char) * 8;
 
-	if (this->getSize() >= _message.size() * charSize) {
+	if (this->getSize() >= (_message.size() + PPMImage::PREFIX_SIZE + 1) * charSize) {
 		size_t offset = 0;
-		for (size_t i = 0; i < _message.size(); i++) {
-			size_t shift = charSize;
+		size_t shift = charSize;
+		for (size_t i = 0; i < PPMImage::PREFIX_SIZE; i++) {
+			shift = charSize;
 			while (shift > 0) {
 				shift--;
-
+				std::uint8_t binary = 1;
+				unsigned char item = PPMImage::MESSAGE_PREFIX[i] & (binary << shift);
+				this->colors[offset] = this->colors[offset] >> 1;
+				this->colors[offset] = this->colors[offset] << 1;
+				this->colors[offset] = this->colors[offset] | (item >> shift);
 				offset += 1;
-				unsigned char binary = 1;
-				unsigned char item = _message[i] & (binary << shift);
-				this->colors[offset] = this->colors[offset] | item;
 			}
 		}
+
+		for (size_t i = 0; i < _message.size(); i++) {
+			shift = charSize;
+			while (shift > 0) {
+				shift--;
+				std::uint8_t binary = 1;
+				unsigned char item = _message[i] & (binary << shift);
+				this->colors[offset] = this->colors[offset] >> 1;
+				this->colors[offset] = this->colors[offset] << 1;
+				this->colors[offset] = this->colors[offset] | (item >> shift);
+				offset += 1;				
+			}
+		}
+
+		shift = charSize;
+		while (shift > 0) {
+			shift--;
+			this->colors[offset] = this->colors[offset] & ~(1);
+			offset += 1;
+		}
 	} else {
-		throw 201;
+		throw FAILED_MESSAGE_TOO_LAGER;
 	}
 }
 
 std::string PPMImage::recoverData() {
 	std::string message = "";
-	unsigned int offset = 0;
+	size_t offset = 0;
 	size_t size = this->getSize();
-
+	unsigned int charSize = sizeof(unsigned char) * 8;
 	
 	unsigned char character = 0;
-	unsigned char binaryChar = 0;
-	while (character != '\0') {
-		unsigned int shift = sizeof(unsigned char) * 8;
-		binaryChar = 0;
+	std::uint8_t binaryString = 0;
+	while (true) {
+		size_t shift = charSize;
+		binaryString = 0;
 
 		while (offset < size && shift > 0) {
-			offset += 1;
 			shift--;
 
-			unsigned char binary = 1;
-			binaryChar = binaryChar | ((this->colors[offset] & binary) << shift);
+			std::uint8_t binary = 1;
+			binaryString = binaryString | ((this->colors[offset] & binary) << shift);
+			offset += 1;
 		}
 		
 		if (offset >= size) {
-			throw 202;
+			throw FAILED_MESSAGE_NOT_FOUND;
 		}
-		character = static_cast<unsigned char>(binaryChar);
+		
+		character = binaryString;
 		message.push_back(character);
+		if (binaryString == 0) {
+			break;
+		}
+
+		if (message.length() == PPMImage::PREFIX_SIZE && message.compare(PPMImage::MESSAGE_PREFIX) != 0) {
+			throw FAILED_MESSAGE_NOT_FOUND;
+		}
 	}
 	
+	if (message.length() < PPMImage::PREFIX_SIZE || message.length() >= PPMImage::PREFIX_SIZE && message.substr(0,3).compare(PPMImage::MESSAGE_PREFIX) != 0) {
+		throw FAILED_MESSAGE_NOT_FOUND;
+	}
+	message = message.substr(3);
 	return message;
 }
 
@@ -100,8 +144,10 @@ void PPMImage::grayscale() {
 				colorValue += (double)rgb[i] * multiplier[i];
 			}
 
-			for (size_t i = 0; i < 3; i++) {
-				newRgb[i] = static_cast<std::uint8_t>(colorValue);
+			colorValue = colorValue < this->maxColor ? colorValue : this->maxColor;
+
+			for (size_t j = 0; j < 3; j++) {
+				newRgb[j] = static_cast<std::uint8_t>(colorValue);
 			}
 			this->setRGB(i, newRgb);
 			delete[] rgb;
@@ -130,8 +176,13 @@ void PPMImage::sepia() {
 			}
 
 			for (size_t i = 0; i < 3; i++) {
-				newRgb[i] = static_cast<std::uint8_t>(colorValues[i]);
+				colorValues[i] = colorValues[i] < this->maxColor ? colorValues[i] : this->maxColor;
 			}
+
+			for (size_t i = 0; i < 3; i++) {
+				newRgb[i] = static_cast<std::uint8_t>(colorValues[i]);;
+			}
+
 			this->setRGB(i, newRgb);
 			delete[] rgb;
 		}
@@ -182,6 +233,8 @@ std::uint8_t* PPMImage::getRGB(size_t index) {
 void PPMImage::setRGB(size_t index, std::uint8_t* rgb) {
 	if (index % 3 == 0) {
 		for (size_t i = 0; i < 3; i++) {
+			rgb[i] = rgb[i] >> 1;
+			rgb[i] = rgb[i] << 1;
 			this->colors[i + index] = rgb[i] | (this->colors[i + index] & 1);
 		}
 	}

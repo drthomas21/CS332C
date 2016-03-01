@@ -91,9 +91,14 @@ void PPMImage::hideData(const std::string &message) {
 
 std::string PPMImage::recoverData() {
 	std::string message = "";
+	std::string messagePrefix = "";
 	size_t offset = 0;
 	size_t size = this->getSize();
 	unsigned int charSize = sizeof(unsigned char) * 8;
+
+	for (size_t i = 0; i < PPMImage::PREFIX_SIZE; i++) {
+		messagePrefix.push_back(PPMImage::MESSAGE_PREFIX[i]);
+	}
 	
 	unsigned char character = 0;
 	std::uint8_t binaryString = 0;
@@ -119,12 +124,12 @@ std::string PPMImage::recoverData() {
 			break;
 		}
 
-		if (message.length() == PPMImage::PREFIX_SIZE && message.compare(PPMImage::MESSAGE_PREFIX) != 0) {
+		if (message.length() == PPMImage::PREFIX_SIZE && message.compare(messagePrefix) != 0) {
 			throw FAILED_MESSAGE_NOT_FOUND;
 		}
 	}
 	
-	if (message.length() < PPMImage::PREFIX_SIZE || message.length() >= PPMImage::PREFIX_SIZE && message.substr(0,3).compare(PPMImage::MESSAGE_PREFIX) != 0) {
+	if (message.length() < PPMImage::PREFIX_SIZE || message.length() >= PPMImage::PREFIX_SIZE && message.substr(0,3).compare(messagePrefix) != 0) {
 		throw FAILED_MESSAGE_NOT_FOUND;
 	}
 	message = message.substr(3);

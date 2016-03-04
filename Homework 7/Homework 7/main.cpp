@@ -25,6 +25,7 @@ int main() {
 
 
 	//Move Vector to Map
+	int maxGrade = 0;
 	for (size_t i = 0; i < inputtedGrades.size(); i++) {
 		std::map<int, int>::iterator it;
 		it = grades.find(inputtedGrades[i]);
@@ -33,6 +34,18 @@ int main() {
 		}
 
 		grades[inputtedGrades[i]]++;
+		if (maxGrade < inputtedGrades[i]) {
+			maxGrade = inputtedGrades[i];
+		}
+	}
+
+	//Fill in empty spots
+	for (size_t i = 0; i < maxGrade; i++) {
+		std::map<int, int>::iterator it;
+		it = grades.find(i);
+		if (it == grades.end()) {
+			grades[i] = 0;
+		}
 	}
 
 	//Display Map

@@ -39,13 +39,27 @@ int main() {
 	std::getline(std::cin, line);
 	std::istringstream stream(line);
 	while (stream >> word) {
+#ifndef _WIN32
+		using namespace boost;
+		regex regex("^[^A-Za-z0-9]*([A-Za-z0-9]+)[^A-Za-z0-9]*$");
+		smatch matches;
+		if (regex_match(word, matches, regex)) {
+			std::string _word = matches[1].str();
+			std::transform(_word.begin(), _word.end(), _word.begin(), ::tolower);
+			query.insert(_word);
+		}
+#endif
+
+#ifdef _WIN32
 		std::regex regex("^[^A-Za-z0-9]*([A-Za-z0-9]+)[^A-Za-z0-9]*$");
 		std::smatch matches;
 		if (std::regex_match(word, matches, regex)) {
 			std::string _word = matches[1].str();
 			std::transform(_word.begin(), _word.end(), _word.begin(), ::tolower);
 			query.insert(_word);
-		}		
+		}
+#endif
+				
 	}
 
 	std::cout << std::endl << "The similarity between the query and document is: " << document.similarity(query) << std::endl;

@@ -1,15 +1,34 @@
 #include "document.h"
 #include <set>
 #include <string>
-#include <regex>
 #include <algorithm>
 #include <iostream>
+
+#ifndef _WIN32
+#include <boost/regex.hpp>
+#endif
+
+#ifdef _WIN32
+#include <regex>
+#endif
 
 const std::set<std::string> Document::getSet() {
 	return this->characters;
 }
 
 void Document::addToSet(const std::string word) {
+#ifndef _WIN32
+	using namespace boost;
+	regex regex("^[^A-Za-z0-9]*([A-Za-z0-9]+)[^A-Za-z0-9]*$");
+	smatch matches;
+	if (regex_match(word, matches, regex)) {
+		std::string _word = matches[1].str();
+		std::transform(_word.begin(), _word.end(), _word.begin(), ::tolower);
+		this->characters.insert(_word);
+	}
+#endif
+
+#ifdef _WIN32
 	std::regex regex("^[^A-Za-z0-9]*([A-Za-z0-9]+)[^A-Za-z0-9]*$");
 	std::smatch matches;
 	if (std::regex_match(word, matches, regex)) {
@@ -17,6 +36,8 @@ void Document::addToSet(const std::string word) {
 		std::transform(_word.begin(), _word.end(), _word.begin(), ::tolower);
 		this->characters.insert(_word);
 	}
+#endif
+	
 }
 
 double Document::similarity(const std::set<std::string> &query) {

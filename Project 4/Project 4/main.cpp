@@ -3,14 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
-
-#ifndef _WIN32
-#include <boost/regex.hpp>
-#endif
-
-#ifdef _WIN32
 #include <regex>
-#endif
 
 int main() {
 	Document document;
